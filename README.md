@@ -5,7 +5,7 @@ Replaces the old Yii 1 application (a copy of its code is kept outside the repo 
 * **Website**: same design (Bootstrap 3 theme assets copied unchanged to `public/assets`), same `.html` URLs.
 * **Admin panel** at `/admin` (custom Blade + Bootstrap 5, no CDN): content, categories, banners/gallery, documents,
   menus, users, groups and permissions, places, **site settings**, **site links** (every list that was hardcoded
-  in the old theme), feedback inbox, audit trail and visitor log.
+  in the old theme), feedback inbox and sign-in history.
 
 ## Data safety: how the live database is handled
 
@@ -75,9 +75,21 @@ turn the flag on only after the Yii admin is retired.
 
 ## Logging in
 
-Existing admin users and passwords keep working (legacy SHA1 is verified at login). Access is controlled by the existing
-`acl` table (group x module x action), editable at **Access Control > User Group > Permissions**.
-Super Users (group 1) always have full access. Anything without an ACL row is denied.
+Existing admin users and passwords keep working (legacy SHA1 is verified at login).
+
+**Roles and permissions** use the standard Laravel package [spatie/laravel-permission](https://spatie.be/docs/laravel-permission).
+A permission is named `<screen>.<ability>` (`content.view`, `banner-category.update`, `settings.update`, ...; abilities are
+view, create, update, delete). A **role** is a set of permissions and each person has one role, set on their user record.
+Manage roles under **Users & access > Roles & permissions** (a matrix of screens by ability). Someone with no role cannot
+sign in to the admin. The `Super Users` role can do everything and cannot be edited or deleted; the last Super User cannot be
+deleted or demoted. Whatever is not granted is denied.
+
+The old user groups and `acl_*` tables were converted: every back-office group became a role of the same name, every allowed
+(module, action) rule became the matching permission, and every user kept their access. The migration checks this per user and per
+permission before dropping the old tables, and dumps them to `storage/app/private/removed-tables/` first.
+
+When a new admin screen is added, `php artisan permissions:sync` (run by `scripts/deploy.sh`) creates its permissions; they are
+granted to nobody except Super Users until you tick them in the role editor.
 
 ## Accounts and passwords
 
@@ -110,7 +122,7 @@ If you change public markup on purpose, refresh the snapshots with `UPDATE_SNAPS
 and review the diff. **Any change that touches the database must follow [docs/DATABASE_CHANGE_RULES.md](docs/DATABASE_CHANGE_RULES.md).**
 
 Nightly (via `php artisan schedule:run` in cron): database + uploads backup to `storage/app/private/`, old backups pruned,
-and visitor/audit rows older than 180 days deleted. Set `BACKUP_NOTIFY_EMAIL` and the mail settings to get failure notices.
+and sign-in history older than 180 days deleted. Set `BACKUP_NOTIFY_EMAIL` and the mail settings to get failure notices.
 
 ## Local development
 

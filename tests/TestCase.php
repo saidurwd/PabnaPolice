@@ -4,8 +4,8 @@ namespace Tests;
 
 use App\Admin\Options;
 use App\Models\Setting;
-use App\Policies\AclPolicy;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Spatie\Permission\PermissionRegistrar;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -18,7 +18,7 @@ abstract class TestCase extends BaseTestCase
 
         // These keep per-process static caches; the database is rolled back between tests, so reset them.
         Setting::flush();
-        AclPolicy::forget();
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
         Options::forget();
     }
 }

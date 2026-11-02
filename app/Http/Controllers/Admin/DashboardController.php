@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditTrail;
 use App\Models\Banner;
 use App\Models\Content;
 use App\Models\Document;
 use App\Models\Feedback;
 use App\Models\User;
-use App\Models\Visitor;
 
 class DashboardController extends Controller
 {
@@ -23,7 +23,7 @@ class DashboardController extends Controller
                 ['Unread feedback', Feedback::where('is_read', false)->count(), 'bi-chat-dots', 'feedback'],
             ],
             'recent' => Content::orderByDesc('id')->limit(8)->get(),
-            'visits' => Visitor::orderByDesc('id')->limit(8)->get(),
+            'signIns' => AuditTrail::with('user')->orderByDesc('id')->limit(8)->get(),
         ]);
     }
 }

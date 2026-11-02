@@ -9,6 +9,8 @@ body { background: #f3f5f8; font-size: .925rem; }
 .sidebar .nav-link { color: #cfd8e3; padding: .55rem 1.1rem; display: flex; align-items: center; gap: .65rem; border-left: 3px solid transparent; }
 .sidebar .nav-link:hover { background: rgba(255,255,255,.06); color: #fff; }
 .sidebar .nav-link.active { background: rgba(108,182,255,.14); color: #fff; border-left-color: #6cb6ff; }
+.sidebar .nav-heading { padding: 1rem 1.1rem .3rem; font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #7f93ab; }
+.sidebar .nav-link .badge { font-size: .68rem; }
 .sidebar .sub .nav-link { padding-left: 2.9rem; font-size: .88rem; }
 .sidebar .chev { margin-left: auto; font-size: .7rem; transition: transform .15s; }
 .sidebar [aria-expanded="true"] .chev { transform: rotate(90deg); }

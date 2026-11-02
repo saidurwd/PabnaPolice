@@ -3,7 +3,9 @@
 namespace App\Admin;
 
 use App\Models\CategoryNode;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
 /** Resource-specific behaviour that does not fit the declarative definitions. */
 class ResourceHooks
@@ -22,8 +24,12 @@ class ResourceHooks
     }
 
     /** Called after the model is saved. */
-    public static function saved(string $slug, Model $model, bool $isNew): void
+    public static function saved(string $slug, Model $model, bool $isNew, Request $request): void
     {
+        if ($model instanceof User && $request->filled('role')) {
+            $model->syncRoles([$request->input('role')]);
+        }
+
         if ($model instanceof CategoryNode) {
             $model->rebuildTree();
         }

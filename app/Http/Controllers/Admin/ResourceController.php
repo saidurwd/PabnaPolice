@@ -6,6 +6,7 @@ use App\Admin\Options;
 use App\Admin\ResourceHooks;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ResourceRequest;
+use App\Models\User;
 use App\Support\LegacyPassword;
 use App\Support\SiteCache;
 use Illuminate\Contracts\View\View;
@@ -23,7 +24,7 @@ class ResourceController extends Controller
     public function index(Request $request): View
     {
         $def = $request->attributes->get('resource');
-        $query = $def['model']::query();
+        $query = $def['model']::query()->with($def['with'] ?? []);
 
         if (($q = trim((string) $request->query('q'))) !== '' && $def['search']) {
             $query->where(function ($w) use ($def, $q) {
@@ -132,10 +133,19 @@ class ResourceController extends Controller
 
         $this->guardTreeParent($request, $def, $model);
 
+        // The last Super User can't be demoted: nobody would be able to manage roles any more.
+        if ($def['slug'] === 'user' && $model instanceof User && $model->exists && $model->isLastSuperUser()
+            && $request->input('role') !== config('admin.super_role')) {
+            throw ValidationException::withMessages(['role' => 'This is the last Super User, so it must keep that role.']);
+        }
+
         $data = [];
         $uploads = [];
         foreach ($fields as $f) {
             $name = $f['name'];
+            if (! empty($f['virtual'])) {
+                continue;   // not a database column; handled in ResourceHooks::saved (e.g. the user's role)
+            }
             switch ($f['type']) {
                 case 'password':
                     if (filled($request->input($name))) {
@@ -180,7 +190,7 @@ class ResourceController extends Controller
         $model->fill($data);
         $model->save();
 
-        ResourceHooks::saved($def['slug'], $model, $isNew);
+        ResourceHooks::saved($def['slug'], $model, $isNew, $request);
         Options::forget();
         SiteCache::flush();
 

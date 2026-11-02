@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
 
 /** @extends Factory<User> */
 class UserFactory extends Factory
@@ -17,24 +18,22 @@ class UserFactory extends Factory
         return [
             'full_name' => fake()->name(), 'username' => fake()->unique()->userName(), 'email' => fake()->unique()->safeEmail(),
             'password' => sha1('secret12'), 'photo' => '',
-            'group_id' => fn () => self::ensureGroup(1),
             'status_id' => fn () => self::ensureStatus(1),
         ];
     }
 
-    public function inGroup(int $group): static
+    /** Gives the user the named role (created if missing). Roles are what allow someone into the admin panel. */
+    public function role(string $name): static
     {
-        return $this->state(['group_id' => self::ensureGroup($group)]);
+        return $this->afterCreating(fn (User $user) => $user->assignRole(Role::findOrCreate($name, 'web')));
     }
 
-    /** The foreign keys need real rows: create the group/status if the test database does not have them yet. */
-    private static function ensureGroup(int $id): int
+    public function superUser(): static
     {
-        DB::table('user_groups')->insertOrIgnore(['id' => $id, 'group_type' => 'Back', 'title' => $id === 1 ? 'Super Users' : "Group {$id}"]);
-
-        return $id;
+        return $this->role(config('admin.super_role'));
     }
 
+    /** The foreign key needs a real row: create the status if the test database does not have it yet. */
     private static function ensureStatus(int $id): int
     {
         DB::table('user_statuses')->insertOrIgnore(['id' => $id, 'title' => 'Active']);

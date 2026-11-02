@@ -5,34 +5,32 @@ namespace App\Http\Middleware;
 use App\Admin\ResourceRegistry;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 
 /**
- * Maps the current admin route to the legacy ACL (controller key + admin/create/update/delete).
- * Resource routes carry a {resource} slug; special pages set ->defaults('acl', ...).
+ * Checks the signed-in user's permission for the current admin route.
+ * Resource screens need "<slug>.<ability>" (content.view, banner.update, ...); special pages declare their permission
+ * with ->defaults('permission', 'settings.update'). Super users pass via Gate::before.
  */
 class AuthorizeResource
 {
-    private const MAP = [
-        'index' => 'admin', 'show' => 'admin', 'create' => 'create', 'store' => 'create',
-        'edit' => 'update', 'update' => 'update', 'destroy' => 'delete', 'restore' => 'update',
+    private const ABILITY = [
+        'index' => 'view', 'show' => 'view', 'create' => 'create', 'store' => 'create',
+        'edit' => 'update', 'update' => 'update', 'restore' => 'update', 'destroy' => 'delete',
     ];
 
     public function handle(Request $request, Closure $next)
     {
         $route = $request->route();
-        $aclKey = $route->defaults['acl'] ?? null;
+        $permission = $route->defaults['permission'] ?? null;
 
-        if (! $aclKey) {
+        if (! $permission) {
             $def = ResourceRegistry::find((string) $route->parameter('resource'));
             abort_if($def === null, 404);
-            $aclKey = $def['acl'];
+            $permission = $def['slug'].'.'.(self::ABILITY[$route->getActionMethod()] ?? 'view');
             $request->attributes->set('resource', $def);
         }
 
-        $action = $route->defaults['acl_action'] ?? (self::MAP[$route->getActionMethod()] ?? 'admin');
-
-        abort_unless(Gate::forUser($request->user())->allows('acl', [$aclKey, $action]), 403);
+        abort_unless($request->user()?->can($permission), 403);
 
         return $next($request);
     }

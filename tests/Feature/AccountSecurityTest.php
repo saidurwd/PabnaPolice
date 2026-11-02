@@ -16,7 +16,7 @@ class AccountSecurityTest extends TestCase
 
     private function admin(array $attrs = []): User
     {
-        return User::factory()->create($attrs + ['username' => 'boss', 'email' => 'boss@example.com', 'full_name' => 'The Boss']);
+        return User::factory()->superUser()->create($attrs + ['username' => 'boss', 'email' => 'boss@example.com', 'full_name' => 'The Boss']);
     }
 
     public function test_password_reset_by_email(): void

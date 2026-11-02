@@ -3,7 +3,6 @@
 use App\Http\Middleware\AdminAuthenticate;
 use App\Http\Middleware\AuthorizeResource;
 use App\Http\Middleware\ContentSecurityPolicy;
-use App\Http\Middleware\LogAdminVisit;
 use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -30,7 +29,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin.auth' => AdminAuthenticate::class,
             'admin.can' => AuthorizeResource::class,
-            'admin.log' => LogAdminVisit::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

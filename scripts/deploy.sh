@@ -60,6 +60,9 @@ MIGRATING=1
 "$PHP" artisan migrate --force
 MIGRATING=0
 
+say "Syncing permissions"
+"$PHP" artisan permissions:sync
+
 say "Rebuilding caches"
 "$PHP" artisan optimize:clear
 "$PHP" artisan config:cache

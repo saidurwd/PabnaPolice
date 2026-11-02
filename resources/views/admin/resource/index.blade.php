@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 @section('title', $def['plural'])
-@php($can = fn ($a) => auth()->user()->can('acl', [$def['acl'], $a]))
+@php($can = fn ($a) => auth()->user()->can($def['slug'].'.'.$a))
 @section('content')
 <div class="card">
     <div class="card-body">
@@ -59,9 +59,6 @@
                         </td>
                     @endforeach
                     <td class="text-end text-nowrap">
-                        @foreach (($def['rowLinks'] ?? []) as $route => $label)
-                            @if ($can('update'))<a class="btn btn-sm btn-outline-secondary" href="{{ route('admin.'.$route.'.edit', $row->id) }}"><i class="bi bi-key"></i> {{ $label }}</a>@endif
-                        @endforeach
                         @if (request()->boolean('trashed') && $can('update'))
                             <form class="d-inline" method="post" action="{{ route('admin.resource.restore', [$def['slug'], $row->id]) }}">@csrf
                                 <button class="btn btn-sm btn-outline-success"><i class="bi bi-arrow-counterclockwise"></i> Restore</button></form>

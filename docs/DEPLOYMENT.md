@@ -25,8 +25,8 @@ On your own machine (PHP 8.3+, Composer, Node 20+):
 On the server:
 1. Upload and unzip the release over the application folder. **Do not overwrite** `.env` or `public/uploads/`.
 2. Preview, changing nothing: `./scripts/deploy.sh --check` (pending migrations, the SQL they would run, health report).
-3. Deploy: `./scripts/deploy.sh`. It backs up the database, switches maintenance mode on, runs the migrations, rebuilds the
-   caches, switches maintenance mode off and prints the health report. If a step fails the site is brought back up and the
+3. Deploy: `./scripts/deploy.sh`. It backs up the database, switches maintenance mode on, runs the migrations, syncs the permission
+   list (`php artisan permissions:sync`), rebuilds the caches, switches maintenance mode off and prints the health report. If a step fails the site is brought back up and the
    backup file is named in the output.
 
 Use a different PHP binary with `PHP_BIN=/opt/cpanel/ea-php83/root/usr/bin/php ./scripts/deploy.sh`.

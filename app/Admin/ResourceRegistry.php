@@ -2,9 +2,6 @@
 
 namespace App\Admin;
 
-use App\Models\Acl;
-use App\Models\AclAction;
-use App\Models\AclController;
 use App\Models\AuditTrail;
 use App\Models\Banner;
 use App\Models\BannerCategory;
@@ -12,7 +9,6 @@ use App\Models\Category;
 use App\Models\City;
 use App\Models\Content;
 use App\Models\Country;
-use App\Models\Customer;
 use App\Models\District;
 use App\Models\Document;
 use App\Models\DocumentCategory;
@@ -22,9 +18,7 @@ use App\Models\SiteLink;
 use App\Models\State;
 use App\Models\Thana;
 use App\Models\User;
-use App\Models\UserGroup;
 use App\Models\UserStatus;
-use App\Models\Visitor;
 
 /**
  * Declarative description of every admin CRUD screen. The generic ResourceController and the
@@ -47,18 +41,6 @@ class ResourceRegistry
         return self::all()[$slug] ?? null;
     }
 
-    /** Resource by legacy ACL/menu controller name ("bannerCategory", "Country", ...). */
-    public static function findByAcl(string $name): ?array
-    {
-        foreach (self::all() as $def) {
-            if (strcasecmp($def['acl'], $name) === 0) {
-                return $def;
-            }
-        }
-
-        return null;
-    }
-
     private static function build(): array
     {
         $status = ['name' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => 'status', 'rules' => 'required|in:Active,Inactive'];
@@ -78,7 +60,7 @@ class ResourceRegistry
             // ---------------------------------------------------------------- content
             'content' => [
                 'softDeletes' => true,
-                'acl' => 'content', 'model' => Content::class, 'title' => 'Content', 'plural' => 'Contents', 'icon' => 'bi-file-earmark-text',
+                'model' => Content::class, 'title' => 'Content', 'plural' => 'Contents', 'icon' => 'bi-file-earmark-text',
                 'order' => ['published_at', 'desc'], 'search' => ['title', 'details'], 'audit' => true, 'perPage' => 25,
                 'filters' => ['category_id' => ['Category', 'categories'], 'status' => ['Status', 'status']],
                 'columns' => [
@@ -98,7 +80,7 @@ class ResourceRegistry
                 ],
             ],
             'category' => [
-                'acl' => 'category', 'model' => Category::class, 'title' => 'Category', 'plural' => 'Categories', 'icon' => 'bi-diagram-3',
+                'model' => Category::class, 'title' => 'Category', 'plural' => 'Categories', 'icon' => 'bi-diagram-3',
                 'order' => ['alias', 'asc'], 'search' => ['title', 'alias'], 'audit' => true, 'tree' => true,
                 'filters' => ['status' => ['Status', 'status']],
                 'columns' => [['id', 'ID'], ['alias', 'Category', 'limit', 80], ['listing', 'Listing'], ['status', 'Status', 'badge']],
@@ -115,7 +97,7 @@ class ResourceRegistry
             // ---------------------------------------------------------------- banners
             'banner' => [
                 'softDeletes' => true,
-                'acl' => 'banner', 'model' => Banner::class, 'title' => 'Banner', 'plural' => 'Banners', 'icon' => 'bi-images',
+                'model' => Banner::class, 'title' => 'Banner', 'plural' => 'Banners', 'icon' => 'bi-images',
                 'order' => ['id', 'desc'], 'search' => ['title'], 'audit' => true,
                 'filters' => ['category_id' => ['Category', 'banner_categories'], 'status' => ['Status', 'status']],
                 'columns' => [
@@ -133,7 +115,7 @@ class ResourceRegistry
                 ],
             ],
             'banner-category' => [
-                'acl' => 'bannerCategory', 'model' => BannerCategory::class, 'title' => 'Banner category', 'plural' => 'Banner categories', 'icon' => 'bi-collection',
+                'model' => BannerCategory::class, 'title' => 'Banner category', 'plural' => 'Banner categories', 'icon' => 'bi-collection',
                 'order' => ['id', 'asc'], 'search' => ['title'], 'audit' => true, 'tree' => true,
                 'columns' => [['id', 'ID'], ['alias', 'Category', 'limit', 80], ['status', 'Status', 'badge']],
                 'fields' => [
@@ -148,7 +130,7 @@ class ResourceRegistry
             // ---------------------------------------------------------------- documents
             'document' => [
                 'softDeletes' => true,
-                'acl' => 'document', 'model' => Document::class, 'title' => 'Document', 'plural' => 'Documents', 'icon' => 'bi-file-earmark-pdf',
+                'model' => Document::class, 'title' => 'Document', 'plural' => 'Documents', 'icon' => 'bi-file-earmark-pdf',
                 'order' => ['published_at', 'desc'], 'search' => ['title'], 'audit' => true,
                 'filters' => ['category_id' => ['Category', 'document_categories'], 'status' => ['Status', 'status']],
                 'columns' => [
@@ -164,7 +146,7 @@ class ResourceRegistry
                 ],
             ],
             'document-category' => [
-                'acl' => 'documentCategory', 'model' => DocumentCategory::class, 'title' => 'Document category', 'plural' => 'Document categories', 'icon' => 'bi-folder',
+                'model' => DocumentCategory::class, 'title' => 'Document category', 'plural' => 'Document categories', 'icon' => 'bi-folder',
                 'order' => ['id', 'asc'], 'search' => ['title'], 'audit' => true, 'tree' => true,
                 'columns' => [['id', 'ID'], ['alias', 'Category', 'limit', 80], ['status', 'Status', 'badge']],
                 'fields' => [
@@ -178,7 +160,7 @@ class ResourceRegistry
             ],
             // ---------------------------------------------------------------- site
             'site-link' => [
-                'acl' => 'siteLink', 'model' => SiteLink::class, 'title' => 'Site link', 'plural' => 'Site links', 'icon' => 'bi-link-45deg',
+                'model' => SiteLink::class, 'title' => 'Site link', 'plural' => 'Site links', 'icon' => 'bi-link-45deg',
                 'order' => ['group', 'asc', 'ordering'], 'search' => ['title', 'url'],
                 'filters' => ['group' => ['Group', 'link_groups'], 'status' => ['Status', 'status']],
                 'columns' => [
@@ -197,7 +179,7 @@ class ResourceRegistry
                 ],
             ],
             'feedback' => [
-                'acl' => 'feedback', 'model' => Feedback::class, 'title' => 'Feedback', 'plural' => 'Feedback', 'icon' => 'bi-chat-dots',
+                'model' => Feedback::class, 'title' => 'Feedback', 'plural' => 'Feedback', 'icon' => 'bi-chat-dots',
                 'order' => ['id', 'desc'], 'search' => ['name', 'email', 'message'], 'actions' => ['index', 'edit', 'destroy'],
                 'columns' => [
                     ['id', 'ID'], ['name', 'Name'], ['email', 'Email'], ['phone', 'Phone'], ['message', 'Message', 'limit', 60],
@@ -216,68 +198,33 @@ class ResourceRegistry
             ],
             // ---------------------------------------------------------------- access control
             'user' => [
-                'acl' => 'user', 'model' => User::class, 'title' => 'User', 'plural' => 'Users', 'icon' => 'bi-person',
+                'model' => User::class, 'title' => 'User', 'plural' => 'Users', 'icon' => 'bi-person',
                 'order' => ['id', 'asc'], 'search' => ['full_name', 'username', 'email'],
-                'filters' => ['group_id' => ['Group', 'user_groups'], 'status_id' => ['Status', 'user_statuses']],
+                'with' => ['roles'], 'filters' => ['status_id' => ['Status', 'user_statuses']],
                 'columns' => [
                     ['id', 'ID'], ['photo', 'Photo', 'image', 'user'], ['full_name', 'Name'], ['username', 'Username'], ['email', 'Email'],
-                    ['group_id', 'Group', 'option', 'user_groups'], ['status_id', 'Status', 'option', 'user_statuses'], ['last_login_at', 'Last sign-in', 'datetime'],
+                    ['role', 'Role'], ['status_id', 'Status', 'option', 'user_statuses'], ['last_login_at', 'Last sign-in', 'datetime'],
                 ],
                 'fields' => [
                     ['name' => 'full_name', 'label' => 'Full name', 'type' => 'text', 'rules' => 'required|max:150'],
                     ['name' => 'username', 'label' => 'Username', 'type' => 'text', 'rules' => 'required|max:100|unique:users,username,{id}'],
                     ['name' => 'email', 'label' => 'Email', 'type' => 'email', 'rules' => 'required|email|max:100|unique:users,email,{id}'],
                     ['name' => 'password', 'label' => 'Password', 'type' => 'password', 'rules' => 'nullable|min:6|max:100', 'required_on' => 'create', 'help' => 'Leave blank to keep the current password.'],
-                    ['name' => 'group_id', 'label' => 'Group', 'type' => 'select', 'options' => 'user_groups', 'rules' => 'required|integer'],
+                    ['name' => 'role', 'label' => 'Role', 'type' => 'select', 'options' => 'roles', 'rules' => 'required|exists:roles,name', 'virtual' => true, 'help' => 'What this person may do. Roles and their permissions are managed under Roles & permissions.'],
                     ['name' => 'status_id', 'label' => 'Status', 'type' => 'select', 'options' => 'user_statuses', 'rules' => 'required|integer'],
                     ['name' => 'photo', 'label' => 'Photo', 'type' => 'image', 'dir' => 'user', 'rules' => 'nullable|image|max:4096'],
                 ],
-                'guard' => fn ($m) => (int) $m->id === (int) auth()->id() ? 'You cannot delete your own account.' : null,
-            ],
-            'user-group' => [
-                'acl' => 'userGroup', 'model' => UserGroup::class, 'title' => 'User group', 'plural' => 'User groups', 'icon' => 'bi-people',
-                'order' => ['id', 'asc'], 'search' => ['title'], 'rowLinks' => ['access' => 'Permissions'],
-                'columns' => [['id', 'ID'], ['title', 'Title'], ['group_type', 'Type'], ['details', 'Details', 'limit', 60]],
-                'fields' => [
-                    ['name' => 'group_type', 'label' => 'Type', 'type' => 'select', 'options' => 'group_type', 'rules' => 'required|in:Front,Back'],
-                    ['name' => 'title', 'label' => 'Title', 'type' => 'text', 'rules' => 'required|max:150|unique:user_groups,title,{id}'],
-                    ['name' => 'details', 'label' => 'Details', 'type' => 'textarea', 'rules' => 'nullable'],
-                ],
-                'guard' => fn ($m) => (int) $m->id <= 1 ? 'Super Users cannot be deleted.'
-                    : (User::where('group_id', $m->id)->exists() ? 'Users still belong to it.' : null),
+                'guard' => fn ($m) => (int) $m->id === (int) auth()->id() ? 'You cannot delete your own account.' : ($m->isLastSuperUser() ? 'It is the last Super User.' : null),
             ],
             'user-status' => [
-                'acl' => 'userStatus', 'model' => UserStatus::class, 'title' => 'User status', 'plural' => 'User statuses', 'icon' => 'bi-toggles',
+                'model' => UserStatus::class, 'title' => 'User status', 'plural' => 'User statuses', 'icon' => 'bi-toggles',
                 'order' => ['id', 'asc'], 'search' => ['title'],
                 'columns' => [['id', 'ID'], ['title', 'Title']],
                 'fields' => [['name' => 'title', 'label' => 'Title', 'type' => 'text', 'rules' => 'required|max:100']],
                 'guard' => fn ($m) => User::where('status_id', $m->id)->exists() ? 'Users still use this status.' : null,
             ],
-            'acl-controller' => [
-                'acl' => 'aclController', 'model' => AclController::class, 'title' => 'Access module', 'plural' => 'Access modules', 'icon' => 'bi-shield-lock',
-                'order' => ['id', 'asc'], 'search' => ['controller', 'title'],
-                'columns' => [['id', 'ID'], ['controller', 'Key'], ['title', 'Title'], ['status', 'Status', 'bool']],
-                'fields' => [
-                    ['name' => 'controller', 'label' => 'Key', 'type' => 'text', 'rules' => 'required|max:150', 'help' => 'Matches the ACL rows and menu entries (e.g. content, bannerCategory).'],
-                    ['name' => 'title', 'label' => 'Title', 'type' => 'text', 'rules' => 'required|max:150'],
-                    ['name' => 'controller_type', 'label' => 'Type', 'type' => 'number', 'rules' => 'nullable|integer'],
-                    ['name' => 'status', 'label' => 'Enabled', 'type' => 'bool', 'rules' => 'nullable|boolean'],
-                ],
-            ],
-            'acl-action' => [
-                'acl' => 'aclController', 'model' => AclAction::class, 'title' => 'Access action', 'plural' => 'Access actions', 'icon' => 'bi-key',
-                'order' => ['controller_id', 'asc'], 'search' => ['title', 'action'],
-                'filters' => ['controller_id' => ['Module', 'acl_controllers']],
-                'columns' => [['id', 'ID'], ['controller_id', 'Module', 'option', 'acl_controllers'], ['title', 'Title'], ['action', 'Action']],
-                'fields' => [
-                    ['name' => 'controller_id', 'label' => 'Module', 'type' => 'select', 'options' => 'acl_controllers', 'rules' => 'required|integer'],
-                    ['name' => 'title', 'label' => 'Title', 'type' => 'text', 'rules' => 'required|max:150'],
-                    ['name' => 'action', 'label' => 'Action', 'type' => 'text', 'rules' => 'required|max:150', 'help' => 'admin, create, update or delete.'],
-                    ['name' => 'controller_type', 'label' => 'Type', 'type' => 'number', 'rules' => 'nullable|integer'],
-                ],
-            ],
             'menu' => [
-                'acl' => 'menu', 'model' => Menu::class, 'title' => 'Menu item', 'plural' => 'Menus', 'icon' => 'bi-list',
+                'model' => Menu::class, 'title' => 'Menu item', 'plural' => 'Menus', 'icon' => 'bi-list',
                 'order' => ['parent_id', 'asc', 'ordering'], 'search' => ['title', 'url'],
                 'columns' => [
                     ['id', 'ID'], ['title', 'Title'], ['parent_id', 'Parent', 'option', 'menu_parents'], ['url', 'URL'], ['ordering', 'Order'], ['status', 'Enabled', 'bool'],
@@ -295,7 +242,7 @@ class ResourceRegistry
             ],
             // ---------------------------------------------------------------- places
             'country' => [
-                'acl' => 'Country', 'model' => Country::class, 'title' => 'Country', 'plural' => 'Countries', 'icon' => 'bi-globe',
+                'model' => Country::class, 'title' => 'Country', 'plural' => 'Countries', 'icon' => 'bi-globe',
                 'order' => ['title', 'asc'], 'search' => ['title', 'country_2_code', 'country_3_code'],
                 'columns' => [['id', 'ID'], ['title', 'Country'], ['country_2_code', 'Code 2'], ['country_3_code', 'Code 3'], ['status', 'Status', 'badge']],
                 'fields' => [
@@ -307,7 +254,7 @@ class ResourceRegistry
                 'guard' => fn ($m) => State::where('country_id', $m->id)->exists() ? 'It has states.' : null,
             ],
             'state' => [
-                'acl' => 'State', 'model' => State::class, 'title' => 'State', 'plural' => 'States', 'icon' => 'bi-geo',
+                'model' => State::class, 'title' => 'State', 'plural' => 'States', 'icon' => 'bi-geo',
                 'order' => ['title', 'asc'], 'search' => ['title'], 'filters' => ['country_id' => ['Country', 'countries']],
                 'columns' => [['id', 'ID'], ['title', 'State'], ['country_id', 'Country', 'option', 'countries'], ['state_2_code', 'Code 2'], ['status', 'Status', 'badge']],
                 'fields' => [
@@ -320,7 +267,7 @@ class ResourceRegistry
                 'guard' => fn ($m) => City::where('state_id', $m->id)->exists() ? 'It has cities.' : null,
             ],
             'city' => [
-                'acl' => 'City', 'model' => City::class, 'title' => 'City', 'plural' => 'Cities', 'icon' => 'bi-building',
+                'model' => City::class, 'title' => 'City', 'plural' => 'Cities', 'icon' => 'bi-building',
                 'order' => ['title', 'asc'], 'search' => ['title'], 'filters' => ['state_id' => ['State', 'states']],
                 'columns' => [['id', 'ID'], ['title', 'City'], ['state_id', 'State', 'option', 'states'], ['country_id', 'Country', 'option', 'countries'], ['status', 'Status', 'badge']],
                 'fields' => [
@@ -333,7 +280,7 @@ class ResourceRegistry
                 'guard' => fn ($m) => District::where('city_id', $m->id)->exists() ? 'It has districts.' : null,
             ],
             'district' => [
-                'acl' => 'District', 'model' => District::class, 'title' => 'District', 'plural' => 'Districts', 'icon' => 'bi-pin-map',
+                'model' => District::class, 'title' => 'District', 'plural' => 'Districts', 'icon' => 'bi-pin-map',
                 'order' => ['title', 'asc'], 'search' => ['title'], 'filters' => ['city_id' => ['City', 'cities']],
                 'columns' => [['id', 'ID'], ['title', 'District'], ['city_id', 'City', 'option', 'cities'], ['state_id', 'State', 'option', 'states'], ['status', 'Status', 'badge']],
                 'fields' => [
@@ -344,7 +291,7 @@ class ResourceRegistry
                 'guard' => fn ($m) => Thana::where('district_id', $m->id)->exists() ? 'It has thanas.' : null,
             ],
             'thana' => [
-                'acl' => 'Thana', 'model' => Thana::class, 'title' => 'Thana', 'plural' => 'Thanas', 'icon' => 'bi-shield',
+                'model' => Thana::class, 'title' => 'Thana', 'plural' => 'Thanas', 'icon' => 'bi-shield',
                 'order' => ['title', 'asc'], 'search' => ['title'], 'filters' => ['district_id' => ['District', 'districts']],
                 'columns' => [['id', 'ID'], ['title', 'Thana'], ['district_id', 'District', 'option', 'districts'], ['city_id', 'City', 'option', 'cities'], ['status', 'Status', 'badge']],
                 'fields' => [
@@ -353,29 +300,11 @@ class ResourceRegistry
                     $status,
                 ],
             ],
-            'customer' => [
-                'acl' => 'customer', 'model' => Customer::class, 'title' => 'Customer', 'plural' => 'Customers', 'icon' => 'bi-person-badge',
-                'order' => ['id', 'desc'], 'search' => ['full_name', 'username', 'email'],
-                'columns' => [['id', 'ID'], ['full_name', 'Name'], ['username', 'Username'], ['email', 'Email'], ['status_id', 'Status', 'option', 'user_statuses']],
-                'fields' => [
-                    ['name' => 'full_name', 'label' => 'Full name', 'type' => 'text', 'rules' => 'required|max:150'],
-                    ['name' => 'username', 'label' => 'Username', 'type' => 'text', 'rules' => 'required|max:100|unique:customers,username,{id}'],
-                    ['name' => 'email', 'label' => 'Email', 'type' => 'email', 'rules' => 'required|email|max:100|unique:customers,email,{id}'],
-                    ['name' => 'password', 'label' => 'Password', 'type' => 'password', 'rules' => 'nullable|min:6|max:100', 'required_on' => 'create', 'help' => 'Leave blank to keep the current password.'],
-                    ['name' => 'status_id', 'label' => 'Status', 'type' => 'select', 'options' => 'user_statuses', 'rules' => 'required|integer'],
-                ],
-            ],
             // ---------------------------------------------------------------- logs (read-only)
             'audit-trail' => [
-                'acl' => 'auditTrail', 'model' => AuditTrail::class, 'title' => 'Audit trail', 'plural' => 'Audit trail', 'icon' => 'bi-clock-history',
+                'model' => AuditTrail::class, 'title' => 'Audit trail', 'plural' => 'Audit trail', 'icon' => 'bi-clock-history',
                 'order' => ['id', 'desc'], 'search' => [], 'actions' => ['index', 'destroy'], 'filters' => ['user_id' => ['User', 'users']],
                 'columns' => [['id', 'ID'], ['user_id', 'User', 'option', 'users'], ['login_time', 'Login', 'datetime'], ['logout_time', 'Logout', 'datetime']],
-                'fields' => [],
-            ],
-            'visitor' => [
-                'acl' => 'visitor', 'model' => Visitor::class, 'title' => 'Visitor statistics', 'plural' => 'Visitor statistics', 'icon' => 'bi-bar-chart',
-                'order' => ['id', 'desc'], 'search' => ['user_name', 'page_link', 'visitor_ip'], 'actions' => ['index', 'destroy'],
-                'columns' => [['id', 'ID'], ['user_name', 'User'], ['page_link', 'Page', 'limit', 60], ['visitor_ip', 'IP'], ['server_time', 'Time', 'datetime']],
                 'fields' => [],
             ],
         ];

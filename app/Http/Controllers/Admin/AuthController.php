@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Enums\GroupType;
 use App\Http\Controllers\Controller;
 use App\Models\AuditTrail;
 use App\Models\User;
@@ -42,7 +41,7 @@ class AuthController extends Controller
         if ((int) $user->status_id !== 1) {
             throw ValidationException::withMessages(['username' => $statusError[(int) $user->status_id] ?? 'This account is not allowed to sign in.']);
         }
-        if ($user->group?->group_type !== GroupType::Back) {
+        if (! $user->roles()->exists()) {
             throw ValidationException::withMessages(['username' => 'This account has no access to the admin panel.']);
         }
 

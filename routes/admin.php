@@ -1,13 +1,13 @@
 <?php
 
 use App\Admin\ResourceRegistry;
-use App\Http\Controllers\Admin\AccessController;
 use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EditorUploadController;
 use App\Http\Controllers\Admin\PasswordResetController;
 use App\Http\Controllers\Admin\ResourceController;
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TwoFactorChallengeController;
 use Illuminate\Support\Facades\Route;
@@ -27,7 +27,7 @@ Route::middleware('guest')->group(function () {
     Route::post('two-factor', [TwoFactorChallengeController::class, 'verify'])->middleware('throttle:20,1');
 });
 
-Route::middleware(['admin.auth', 'admin.log'])->group(function () {
+Route::middleware('admin.auth')->group(function () {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/', DashboardController::class)->name('dashboard');
 
@@ -40,18 +40,17 @@ Route::middleware(['admin.auth', 'admin.log'])->group(function () {
     Route::delete('account/two-factor', [AccountController::class, 'disableTwoFactor'])->name('account.two-factor.disable');
 
     Route::middleware('admin.can')->group(function () {
-        Route::get('settings', [SettingController::class, 'edit'])->name('settings')
-            ->defaults('acl', 'setting')->defaults('acl_action', 'admin');
-        Route::put('settings', [SettingController::class, 'update'])->name('settings.update')
-            ->defaults('acl', 'setting')->defaults('acl_action', 'update');
+        Route::get('settings', [SettingController::class, 'edit'])->name('settings')->defaults('permission', 'settings.view');
+        Route::put('settings', [SettingController::class, 'update'])->name('settings.update')->defaults('permission', 'settings.update');
 
-        Route::post('editor-upload', EditorUploadController::class)->name('editor-upload')
-            ->defaults('acl', 'content')->defaults('acl_action', 'create');
+        Route::post('editor-upload', EditorUploadController::class)->name('editor-upload')->defaults('permission', 'content.create');
 
-        Route::get('user-group/{id}/access', [AccessController::class, 'edit'])->name('access.edit')
-            ->defaults('acl', 'userGroup')->defaults('acl_action', 'update');
-        Route::put('user-group/{id}/access', [AccessController::class, 'update'])->name('access.update')
-            ->defaults('acl', 'userGroup')->defaults('acl_action', 'update');
+        Route::get('role', [RoleController::class, 'index'])->name('roles.index')->defaults('permission', 'role.view');
+        Route::get('role/create', [RoleController::class, 'create'])->name('roles.create')->defaults('permission', 'role.create');
+        Route::post('role', [RoleController::class, 'store'])->name('roles.store')->defaults('permission', 'role.create');
+        Route::get('role/{role}/edit', [RoleController::class, 'edit'])->whereNumber('role')->name('roles.edit')->defaults('permission', 'role.update');
+        Route::put('role/{role}', [RoleController::class, 'update'])->whereNumber('role')->name('roles.update')->defaults('permission', 'role.update');
+        Route::delete('role/{role}', [RoleController::class, 'destroy'])->whereNumber('role')->name('roles.destroy')->defaults('permission', 'role.delete');
 
         Route::prefix('{resource}')
             ->where(['resource' => implode('|', array_keys(ResourceRegistry::all()))])

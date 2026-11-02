@@ -2,7 +2,6 @@
 
 namespace App\Admin;
 
-use App\Models\AclController;
 use App\Models\BannerCategory;
 use App\Models\Category;
 use App\Models\City;
@@ -13,8 +12,8 @@ use App\Models\Menu;
 use App\Models\SiteLink;
 use App\Models\State;
 use App\Models\User;
-use App\Models\UserGroup;
 use App\Models\UserStatus;
+use Spatie\Permission\Models\Role;
 
 /** Select-box option sources used by the resource definitions (id => label). */
 class Options
@@ -31,11 +30,10 @@ class Options
             'status' => ['Active' => 'Active', 'Inactive' => 'Inactive'],
             'yesno' => ['No' => 'No', 'Yes' => 'Yes'],
             'user_flag' => [1 => 'Enabled', 0 => 'Disabled'],
-            'group_type' => ['Back' => 'Back (admin panel)', 'Front' => 'Front (website)'],
             'categories' => self::tree(Category::class),
             'banner_categories' => self::tree(BannerCategory::class),
             'document_categories' => self::tree(DocumentCategory::class),
-            'user_groups' => UserGroup::orderBy('id')->pluck('title', 'id')->all(),
+            'roles' => Role::orderBy('name')->pluck('name', 'name')->all(),
             'user_statuses' => UserStatus::orderBy('id')->pluck('title', 'id')->all(),
             'users' => User::orderBy('full_name')->pluck('full_name', 'id')->all(),
             'countries' => Country::orderBy('title')->pluck('title', 'id')->all(),
@@ -43,7 +41,6 @@ class Options
             'cities' => City::orderBy('title')->pluck('title', 'id')->all(),
             'districts' => District::orderBy('title')->pluck('title', 'id')->all(),
             'menu_parents' => Menu::whereNull('parent_id')->orderBy('ordering')->pluck('title', 'id')->all(),
-            'acl_controllers' => AclController::orderBy('title')->pluck('title', 'id')->all(),
             'link_groups' => SiteLink::GROUPS,
             default => throw new \InvalidArgumentException("Unknown option source [{$source}]"),
         };

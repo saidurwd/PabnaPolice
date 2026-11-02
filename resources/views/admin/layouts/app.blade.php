@@ -15,17 +15,19 @@
     <a class="brand" href="{{ route('admin.dashboard') }}"><i class="bi bi-shield-check"></i><span>{{ setting('site_name') }}<br><small class="fw-normal opacity-75">Admin panel</small></span></a>
     <nav class="nav flex-column py-2">
         @foreach ($menu as $i => $item)
-            @if ($item['children'])
+            @if (isset($item['heading']))
+                <div class="nav-heading">{{ $item['heading'] }}</div>
+            @elseif ($item['children'])
                 <a class="nav-link {{ $item['open'] ? '' : 'collapsed' }}" data-bs-toggle="collapse" href="#m{{ $i }}" aria-expanded="{{ $item['open'] ? 'true' : 'false' }}">
                     <i class="bi {{ $item['icon'] }}"></i><span>{{ $item['title'] }}</span><i class="bi bi-chevron-right chev"></i>
                 </a>
                 <div class="collapse sub {{ $item['open'] ? 'show' : '' }}" id="m{{ $i }}">
                     @foreach ($item['children'] as $c)
-                        <a class="nav-link {{ $c['active'] ? 'active' : '' }}" href="{{ $c['url'] }}">{{ $c['title'] }}</a>
+                        <a class="nav-link {{ $c['active'] ? 'active' : '' }}" href="{{ $c['url'] }}">{{ $c['title'] }}@if ($c['badge'])<span class="badge rounded-pill text-bg-danger ms-auto">{{ $c['badge'] }}</span>@endif</a>
                     @endforeach
                 </div>
             @else
-                <a class="nav-link {{ $item['active'] ? 'active' : '' }}" href="{{ $item['url'] }}"><i class="bi {{ $item['icon'] }}"></i><span>{{ $item['title'] }}</span></a>
+                <a class="nav-link {{ $item['active'] ? 'active' : '' }}" href="{{ $item['url'] }}"><i class="bi {{ $item['icon'] }}"></i><span>{{ $item['title'] }}</span>@if ($item['badge'])<span class="badge rounded-pill text-bg-danger ms-auto">{{ $item['badge'] }}</span>@endif</a>
             @endif
         @endforeach
         <a class="nav-link mt-3" href="{{ url('/') }}" target="_blank"><i class="bi bi-box-arrow-up-right"></i><span>View website</span></a>

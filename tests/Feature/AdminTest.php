@@ -3,26 +3,25 @@
 namespace Tests\Feature;
 
 use App\Admin\ResourceRegistry;
-use App\Models\Acl;
 use App\Models\Category;
 use App\Models\Content;
 use App\Models\Setting;
 use App\Models\User;
+use App\Support\PermissionCatalog;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class AdminTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function user(int $group, string $password = 'secret12'): User
+    /** A user with the given role (the super role by default). Roles are what allow someone into the admin panel. */
+    private function user(?string $role = null, string $password = 'secret12'): User
     {
-        // Explicit ids: group 1 means Super User, and `id` is guarded against mass assignment.
-
-        return User::factory()->inGroup($group)->create([
-            'full_name' => "User {$group}", 'username' => "user{$group}", 'email' => "u{$group}@example.com",
-            'password' => sha1($password),
+        return User::factory()->role($role ?? config('admin.super_role'))->create([
+            'full_name' => 'User One', 'username' => 'user1', 'email' => 'u1@example.com', 'password' => sha1($password),
         ]);
     }
 
@@ -34,7 +33,7 @@ class AdminTest extends TestCase
 
     public function test_legacy_sha1_password_can_log_in_and_is_not_rehashed_by_default(): void
     {
-        $user = $this->user(1);
+        $user = $this->user();
 
         $this->post('/admin/login', ['username' => 'user1', 'password' => 'secret12'])->assertRedirect('/admin');
 
@@ -46,7 +45,7 @@ class AdminTest extends TestCase
     public function test_password_is_upgraded_to_bcrypt_when_enabled(): void
     {
         config(['legacy.password_upgrade' => true]);
-        $user = $this->user(1);
+        $user = $this->user();
 
         $this->post('/admin/login', ['username' => 'user1', 'password' => 'secret12']);
 
@@ -55,7 +54,7 @@ class AdminTest extends TestCase
 
     public function test_wrong_password_and_blocked_users_are_rejected(): void
     {
-        $this->user(1);
+        $this->user();
         $this->post('/admin/login', ['username' => 'user1', 'password' => 'wrong'])->assertSessionHasErrors('username');
         $this->assertGuest();
 
@@ -65,43 +64,49 @@ class AdminTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_front_group_users_cannot_enter_the_admin_panel(): void
+    public function test_users_without_a_role_cannot_enter_the_admin_panel(): void
     {
-        DB::table('user_groups')->insert(['id' => 7, 'group_type' => 'Front', 'title' => 'Registered']);
-        DB::table('user_statuses')->insertOrIgnore(['id' => 1, 'title' => 'Active']);
-        User::create(['full_name' => 'F', 'username' => 'front', 'email' => 'f@example.com', 'password' => sha1('secret12'), 'group_id' => 7, 'status_id' => 1]);
+        User::factory()->create(['username' => 'norole', 'email' => 'n@example.com', 'password' => sha1('secret12')]);
 
-        $this->post('/admin/login', ['username' => 'front', 'password' => 'secret12'])->assertSessionHasErrors('username');
+        $this->post('/admin/login', ['username' => 'norole', 'password' => 'secret12'])->assertSessionHasErrors('username');
         $this->assertGuest();
     }
 
-    public function test_acl_table_controls_access_and_defaults_to_deny(): void
+    public function test_permissions_control_access_and_default_to_deny(): void
     {
-        $manager = $this->user(3);
-        Acl::create(['group_id' => 3, 'controller' => 'content', 'actions' => 'admin', 'access' => 1, 'controller_type' => 1]);
-        Acl::create(['group_id' => 3, 'controller' => 'content', 'actions' => 'delete', 'access' => 0, 'controller_type' => 1]);
+        PermissionCatalog::sync();
+        $manager = $this->user('Manager');
+        Role::findByName('Manager')->givePermissionTo(['content.view', 'content.update']);
 
         $this->actingAs($manager)->get('/admin/content')->assertOk();
-        $this->actingAs($manager)->get('/admin/content/create')->assertForbidden();   // no row = no access
+        $this->actingAs($manager)->get('/admin/content/create')->assertForbidden();      // not granted
+        $this->actingAs($manager)->post('/admin/content', [])->assertForbidden();
+        $this->actingAs($manager)->delete('/admin/content/1')->assertForbidden();
         $this->actingAs($manager)->get('/admin/user')->assertForbidden();
         $this->actingAs($manager)->get('/admin/settings')->assertForbidden();
+        $this->actingAs($manager)->get('/admin/role')->assertForbidden();
+
+        // Granting a permission takes effect immediately.
+        Role::findByName('Manager')->givePermissionTo('content.create');
+        $this->actingAs($manager)->get('/admin/content/create')->assertOk();
     }
 
     public function test_super_user_reaches_every_screen(): void
     {
-        $admin = $this->actingAs($this->user(1));
+        $admin = $this->actingAs($this->user());
 
         foreach (array_keys(ResourceRegistry::all()) as $slug) {
             $admin->get("/admin/{$slug}")->assertOk();
         }
         $admin->get('/admin')->assertOk();
         $admin->get('/admin/settings')->assertOk();
-        $admin->get('/admin/user-group/1/access')->assertOk();
+        $admin->get('/admin/role')->assertOk();
+        $admin->get('/admin/role/create')->assertOk();
     }
 
     public function test_editing_content_does_not_move_its_published_date(): void
     {
-        $admin = $this->user(1);
+        $admin = $this->user();
         $cat = Category::factory()->create();
         $content = Content::factory()->create(['category_id' => $cat->id, 'published_at' => '2020-01-05 10:30:00']);
 
@@ -116,7 +121,7 @@ class AdminTest extends TestCase
 
     public function test_category_tree_fields_are_rebuilt_and_cycles_rejected(): void
     {
-        $admin = $this->actingAs($this->user(1));
+        $admin = $this->actingAs($this->user());
         $admin->post('/admin/category', ['title' => 'A', 'status' => 'Active', 'parent_id' => '']);
         $a = Category::where('title', 'A')->first();
         $admin->post('/admin/category', ['title' => 'B', 'status' => 'Active', 'parent_id' => $a->id]);
@@ -132,7 +137,7 @@ class AdminTest extends TestCase
 
     public function test_settings_can_be_changed(): void
     {
-        $this->actingAs($this->user(1))->put('/admin/settings', ['site_name' => 'My Police Site'])->assertRedirect();
+        $this->actingAs($this->user())->put('/admin/settings', ['site_name' => 'My Police Site'])->assertRedirect();
 
         Setting::flush();
         $this->assertSame('My Police Site', setting('site_name'));

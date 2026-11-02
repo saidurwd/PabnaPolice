@@ -14,10 +14,10 @@
                     <span>{{ str_chars_limit($c->title, 80) }}</span><small class="text-muted text-nowrap">{{ legacy_date($c->published_at) }}</small></a>
             @empty <div class="list-group-item text-muted">No content yet.</div> @endforelse
         </div></div></div>
-    <div class="col-lg-5"><div class="card"><div class="card-header bg-white fw-semibold">Recent admin activity</div>
+    <div class="col-lg-5"><div class="card"><div class="card-header bg-white fw-semibold">Recent sign-ins</div>
         <ul class="list-group list-group-flush">
-            @forelse ($visits as $v)
-                <li class="list-group-item d-flex justify-content-between"><span>{{ $v->user_name }} <small class="text-muted">{{ str_chars_limit($v->page_link, 30) }}</small></span><small class="text-muted">{{ $v->server_time }}</small></li>
+            @forelse ($signIns as $s)
+                <li class="list-group-item d-flex justify-content-between"><span>{{ $s->user?->full_name ?? 'Deleted user #'.$s->user_id }}</span><small class="text-muted">{{ $s->login_time }}</small></li>
             @empty <li class="list-group-item text-muted">Nothing yet.</li> @endforelse
         </ul></div></div>
 </div>

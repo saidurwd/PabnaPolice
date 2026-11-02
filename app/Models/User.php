@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * Back-office user.
@@ -17,7 +18,6 @@ use Illuminate\Support\Carbon;
  * @property string $email
  * @property string $password
  * @property string|null $activation
- * @property int|null $group_id
  * @property int|null $status_id
  * @property string|null $picture
  * @property string|null $photo
@@ -28,11 +28,11 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $last_login_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read UserGroup|null $group
+ * @property-read string|null $role  name of the user's (first) role
  */
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, HasRoles, Notifiable;
 
     protected $guarded = ['id'];
 
@@ -48,22 +48,28 @@ class User extends Authenticatable
         ];
     }
 
-    /** @return BelongsTo<UserGroup, $this> */
-    public function group(): BelongsTo
-    {
-        return $this->belongsTo(UserGroup::class);
-    }
-
     /** @return BelongsTo<UserStatus, $this> */
     public function status(): BelongsTo
     {
         return $this->belongsTo(UserStatus::class);
     }
 
-    /** Super Users (group 1) bypass the ACL table. */
+    /** The super role (config admin.super_role) may do everything; Gate::before in AppServiceProvider honours it. */
     public function isSuperUser(): bool
     {
-        return (int) $this->group_id === 1;
+        return $this->hasRole(config('admin.super_role'));
+    }
+
+    /** True when this is the only remaining super user (so it must not be deleted or demoted). */
+    public function isLastSuperUser(): bool
+    {
+        return $this->isSuperUser() && User::role(config('admin.super_role'))->count() <= 1;
+    }
+
+    /** Name of the user's role, for the admin forms and lists (an old-style accessor: a role() method would shadow Spatie's scope). */
+    public function getRoleAttribute(): ?string
+    {
+        return $this->roles->pluck('name')->first();
     }
 
     public function hasTwoFactorEnabled(): bool

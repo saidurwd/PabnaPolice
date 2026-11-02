@@ -7,6 +7,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use RuntimeException;
+use Spatie\DbDumper\Databases\MySql;
 
 /**
  * Base for the Phase 4 "schema normalisation" migrations. They rename tables/columns, convert character sets and
@@ -83,6 +84,45 @@ abstract class BreakingMigration extends Migration
                 throw new RuntimeException("Row count changed for {$old}: {$count} before, {$now} after. Aborting; restore the backup.");
             }
         }
+    }
+
+    /**
+     * Dumps tables (CREATE + all rows) and any extra data to storage/app/private/removed-tables/ BEFORE they are dropped.
+     * Throws, changing nothing, if the dump cannot be written or lacks a table. Returns the .sql path.
+     *
+     * @param  array<int, string>  $tables  unprefixed names that exist
+     * @param  array<string, mixed>  $extra  small related rows saved as <file>-extra.json
+     */
+    protected function backupTables(array $tables, string $label, array $extra = []): string
+    {
+        $dir = storage_path('app/private/removed-tables');
+        if (! is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+        $file = $dir.'/'.now()->format('Ymd-His').'-'.$label.'.sql';
+
+        if ($tables) {
+            $c = config('database.connections.'.config('database.default'));
+            MySql::create()
+                ->setHost($c['host'])->setPort((int) $c['port'])
+                ->setDbName($c['database'])->setUserName($c['username'])->setPassword((string) $c['password'])
+                ->includeTables(array_map(fn ($t) => $this->t($t), $tables))
+                ->dumpToFile($file);
+
+            $dump = (string) @file_get_contents($file);
+            foreach ($tables as $table) {
+                if (! str_contains($dump, 'CREATE TABLE `'.$this->t($table).'`')) {
+                    @unlink($file);
+                    throw new RuntimeException("Backup of {$table} failed (not found in the dump). Nothing was deleted.");
+                }
+            }
+        }
+
+        if ($extra) {
+            file_put_contents(str_replace('.sql', '-extra.json', $file), json_encode($extra, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        }
+
+        return $file;
     }
 
     /** @return string e.g. "int(11) unsigned" */

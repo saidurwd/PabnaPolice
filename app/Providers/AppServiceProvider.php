@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use App\Models\User;
-use App\Policies\AclPolicy;
 use App\View\Composers\FrontComposer;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Pagination\Paginator;
@@ -26,9 +25,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Super Users (group 1) are allowed everything; everyone else is checked against the acl table.
+        // The super role may do everything; everyone else is checked against their roles' permissions
+        // (spatie/laravel-permission registers each permission name with the gate, so $user->can('content.update') works).
         Gate::before(fn (?User $user) => $user?->isSuperUser() ? true : null);
-        Gate::define('acl', [AclPolicy::class, 'allows']);
 
         // Password-reset e-mails link to the admin panel's reset page.
         ResetPassword::createUrlUsing(fn ($user, string $token) => route('admin.password.reset', ['token' => $token, 'email' => $user->getEmailForPasswordReset()]));

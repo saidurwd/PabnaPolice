@@ -20,4 +20,9 @@ The database holds the real site. Follow these for **every** migration, no excep
    which refuses to run unless `YII_RETIRED=true`, verifies row counts before/after, and relaxes the SQL mode only where needed.
    The Phase 4 migrations (`2026_11_10_*`) are of this kind. They check for orphaned references first and stop without
    changing anything if they find any.
-9. Add or update a test for the behaviour, and run `php artisan test`, `./vendor/bin/pint --test` and `./vendor/bin/phpstan analyse`.
+9. **A check that uses the same assumption as the change proves nothing.** The user-groups-to-roles migration once passed its own
+   equivalence test while silently dropping five permissions, because both sides used the same case-sensitive module lookup
+   ("Country" vs "country"). When converting data, (a) fail loudly on any input row that does not map to something and is not on an
+   explicit "dropped on purpose" list, and (b) read a before/after listing of the real data (who can do what) as a human.
+10. Anything that drops tables first dumps them to `storage/app/private/removed-tables/` and aborts if the dump is incomplete.
+11. Add or update a test for the behaviour, and run `php artisan test`, `./vendor/bin/pint --test` and `./vendor/bin/phpstan analyse`.

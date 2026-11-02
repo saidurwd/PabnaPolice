@@ -8,8 +8,11 @@ The database holds the real site. Follow these for **every** migration, no excep
    Guard creates with `Schema::hasTable/hasColumn` so it is safe to re-run on the live database.
 3. **Back up, then rehearse.** `mysqldump --single-transaction` first, then run the whole sequence on a restored copy.
 4. **Look before you run:** `php artisan migrate:status` then `php artisan migrate --pretend`.
-5. **Prove nothing was lost:** record `CHECKSUM TABLE` and row counts before and after for every table that is not
-   supposed to change; only the intended tables may differ.
+5. **Prove nothing was lost:** record row counts for every table, and compare row-level fingerprints before and after.
+   Hash **each row** (`MD5(CONCAT_WS('|', col1, col2, ...))`) and then hash the list ordered by id. Do **not** hash one big
+   `GROUP_CONCAT` of the raw rows: it silently truncates at `group_concat_max_len` (1 KB by default), so it only checks the first
+   few rows and would call two different tables "identical". Hash dates as `UNIX_TIMESTAMP(...)` so renamed/retyped columns compare.
+   Only the intended tables may differ, and for those every original row must still be present unchanged.
 6. **Mind legacy data quirks:** `0000-00-00` dates (strict mode rejects `ALTER`; see `update_user_table_for_laravel`),
    `utf8mb3` columns, ENUM strings and ID columns without foreign keys.
 7. **Keep both apps working while Yii is still deployed.** Do not rename tables/columns until the Yii app is retired.

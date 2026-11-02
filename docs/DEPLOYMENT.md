@@ -36,7 +36,10 @@ Use a different PHP binary with `PHP_BIN=/opt/cpanel/ea-php83/root/usr/bin/php .
 2. Upload the release, create `.env`, set `YII_RETIRED=true`.
 3. `./scripts/deploy.sh --check` (shows what will run; the Phase 4 migrations take a few minutes on the real data).
 4. `./scripts/deploy.sh`. It backs up the database first and aborts on any row-count mismatch.
-   If anything fails, restore the backup and the Yii site is exactly as it was. After a successful run the old Yii app can no longer
+   If a migration fails (for example because a row points at a missing category) the script names the row, **leaves the site in
+   maintenance mode** (the database may be half-migrated) and prints the backup to restore. Either fix the data and run
+   `./scripts/deploy.sh` again (finished steps are skipped and it resumes where it stopped), or restore the backup, then
+   `php artisan up`. Both routes were rehearsed. If anything fails, restore the backup and the Yii site is exactly as it was. After a successful run the old Yii app can no longer
    use this database (tables and columns were renamed): that is the point of no return, so keep the backup.
 
 ## 3. Rolling back

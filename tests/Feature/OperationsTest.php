@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Spatie\Backup\Notifications\Notifications\BackupHasFailedNotification;
 use Tests\TestCase;
 
 class OperationsTest extends TestCase
@@ -139,5 +140,22 @@ class OperationsTest extends TestCase
 
         config(['backup.backup.destination.disks' => ['local', 's3']]);
         $this->assertSame('ok', (new HealthCheck)->run()['offsite_backup']['status']);
+    }
+
+    /** Regression: a copied .env.example has BACKUP_NOTIFY_EMAIL= (empty), which used to crash every artisan command. */
+    public function test_backup_config_loads_with_an_empty_notification_address(): void
+    {
+        $previous = $_ENV['BACKUP_NOTIFY_EMAIL'] ?? null;
+        $_ENV['BACKUP_NOTIFY_EMAIL'] = $_SERVER['BACKUP_NOTIFY_EMAIL'] = '';
+        putenv('BACKUP_NOTIFY_EMAIL=');
+
+        try {
+            $config = require config_path('backup.php');
+            $this->assertSame([], $config['notifications']['notifications'][BackupHasFailedNotification::class]);
+            $this->assertTrue((bool) filter_var($config['notifications']['mail']['to'], FILTER_VALIDATE_EMAIL));
+        } finally {
+            $previous === null ? putenv('BACKUP_NOTIFY_EMAIL') : putenv("BACKUP_NOTIFY_EMAIL={$previous}");
+            unset($_ENV['BACKUP_NOTIFY_EMAIL'], $_SERVER['BACKUP_NOTIFY_EMAIL']);
+        }
     }
 }

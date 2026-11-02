@@ -60,6 +60,11 @@ class HealthCheck
     private function migrations(): array
     {
         $migrator = app('migrator');
+
+        if (! $migrator->repositoryExists()) {
+            return ['fail', 'No migrations table yet: run php artisan migrate --force (expected on the very first deployment)'];
+        }
+
         $files = array_keys($migrator->getMigrationFiles(array_merge($migrator->paths(), [database_path('migrations')])));
         $pending = array_diff($files, $migrator->getRepository()->getRan());
 

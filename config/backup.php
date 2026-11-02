@@ -1,5 +1,9 @@
 <?php
 
+// Failure notices go to BACKUP_NOTIFY_EMAIL; with it empty nothing is e-mailed (the package rejects an empty address).
+$notifyEmail = env('BACKUP_NOTIFY_EMAIL') ?: null;
+$onProblem = $notifyEmail ? ['mail'] : [];
+
 use Spatie\Backup\Notifications\Notifiable;
 use Spatie\Backup\Notifications\Notifications\BackupHasFailedNotification;
 use Spatie\Backup\Notifications\Notifications\BackupWasSuccessfulNotification;
@@ -219,12 +223,13 @@ return [
      */
     'notifications' => [
         'notifications' => [
-            BackupHasFailedNotification::class => ['mail'],
-            UnhealthyBackupWasFoundNotification::class => ['mail'],
-            CleanupHasFailedNotification::class => ['mail'],
-            BackupWasSuccessfulNotification::class => ['mail'],
-            HealthyBackupWasFoundNotification::class => ['mail'],
-            CleanupWasSuccessfulNotification::class => ['mail'],
+            BackupHasFailedNotification::class => $onProblem,
+            UnhealthyBackupWasFoundNotification::class => $onProblem,
+            CleanupHasFailedNotification::class => $onProblem,
+            // Success notices would be one e-mail every night; the health check and logs cover them.
+            BackupWasSuccessfulNotification::class => [],
+            HealthyBackupWasFoundNotification::class => [],
+            CleanupWasSuccessfulNotification::class => [],
         ],
 
         /*
@@ -234,7 +239,7 @@ return [
         'notifiable' => Notifiable::class,
 
         'mail' => [
-            'to' => env('BACKUP_NOTIFY_EMAIL', 'your@example.com'),
+            'to' => $notifyEmail ?? 'noreply@example.invalid',
 
             'from' => [
                 'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),

@@ -49,11 +49,16 @@ Use a different PHP binary with `PHP_BIN=/opt/cpanel/ea-php83/root/usr/bin/php .
 * Application errors: `storage/logs/laravel-YYYY-MM-DD.log` (daily files, the last 14 are kept; set `LOG_DAILY_DAYS` to change).
 * The hourly self-check writes failures and warnings to the log as `Health check <name>: ...`.
 * Nightly backups of the database and `public/uploads/` go to `storage/app/private/<site name>/` and old ones are pruned.
-  **Copy them off the server** (a second disk, S3 or another host): a backup on the same machine does not survive losing it.
+  **Copy them off the server**: set `BACKUP_OFFSITE=true` and the `AWS_*` values of any S3-compatible bucket (AWS S3,
+  Backblaze B2, Wasabi, Cloudflare R2, DigitalOcean Spaces; for the non-AWS ones also set `AWS_ENDPOINT` and
+  `AWS_USE_PATH_STYLE_ENDPOINT=true`). Each nightly backup is then uploaded there too, `backup:monitor` checks daily that the
+  newest one is fresh, and `app:health` warns in production while no off-server copy is configured.
   Set `BACKUP_NOTIFY_EMAIL` (and working `MAIL_*`) to be told when a backup fails.
+  To restore: download the zip, unzip it, import the `.sql` file from `db-dumps/` and copy `uploads/` back into `public/uploads/`.
 * Admin visits and logins older than 180 days are deleted weekly.
 
 ## 5. Not covered yet
-* **Content-Security-Policy**: the public theme uses inline scripts and third-party hosts (Google Fonts, Maps). A policy should be
-  introduced in report-only mode first.
+* **Content-Security-Policy** is sent in *report-only* mode (`CSP_MODE=report-only`): nothing is blocked, violations are written to
+  `storage/logs/csp-*.log`. After a few weeks of real traffic, list what is legitimate in `CSP_EXTRA_SOURCES`, then remove
+  `'unsafe-inline'` where possible and switch to `CSP_MODE=enforce`. `CSP_MODE=off` removes the header.
 * **Error tracking service** (Sentry, Flare, ...): optional; add its package and DSN when you want alerts beyond the log file.

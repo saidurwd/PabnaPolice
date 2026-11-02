@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\AdminAuthenticate;
 use App\Http\Middleware\AuthorizeResource;
+use App\Http\Middleware\ContentSecurityPolicy;
 use App\Http\Middleware\LogAdminVisit;
 use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
@@ -21,6 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->appendToGroup('web', SecurityHeaders::class);
+        $middleware->appendToGroup('web', ContentSecurityPolicy::class);
+        // Browsers POST CSP violation reports without a CSRF token.
+        $middleware->validateCsrfTokens(except: ['csp-report']);
         $middleware->redirectUsersTo(fn () => route('admin.dashboard'));
         $middleware->redirectGuestsTo(fn () => route('admin.login'));
         $middleware->alias([

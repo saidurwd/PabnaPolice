@@ -11,6 +11,7 @@ Artisan::command('inspire', function () {
 // Nightly backup of the database and uploads (storage/app/private/<app name>), then prune old ones.
 Schedule::command('backup:clean')->dailyAt('01:00');
 Schedule::command('backup:run')->dailyAt('01:30');
+Schedule::command('backup:monitor')->dailyAt('03:00');   // warns (by e-mail) when the newest backup is too old
 
 // Expired password-reset tokens, and a regular self-check whose warnings/failures land in the log.
 Schedule::command('auth:clear-resets')->daily();

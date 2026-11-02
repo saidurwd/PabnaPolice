@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CspReportController;
 use App\Http\Controllers\Front\ContentController;
 use App\Http\Controllers\Front\DocumentController;
 use App\Http\Controllers\Front\GalleryController;
@@ -28,6 +29,7 @@ Route::name('front.')->group(function () {
     Route::get('gallery/index/{id}.html', [GalleryController::class, 'index'])->whereNumber('id')->name('gallery.index');
 });
 
+Route::post('csp-report', CspReportController::class)->name('csp-report')->middleware('throttle:60,1');
 Route::get('health', HealthController::class)->name('health')->middleware('throttle:30,1');
 Route::get('robots.txt', [SeoController::class, 'robots'])->name('robots');
 Route::get('sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');

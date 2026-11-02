@@ -161,9 +161,9 @@ return [
             /*
              * The disk names on which the backups will be stored.
              */
-            'disks' => [
-                'local',
-            ],
+            // 'local' keeps a copy on this server; with BACKUP_OFFSITE=true a copy also goes to the S3-compatible disk
+            // configured by the AWS_* settings (AWS S3, Backblaze B2, Wasabi, Cloudflare R2, DigitalOcean Spaces, ...).
+            'disks' => env('BACKUP_OFFSITE', false) ? ['local', 's3'] : ['local'],
 
             /*
              * Determines whether to allow backups to continue when some targets fail instead of failing completely.
@@ -295,7 +295,7 @@ return [
     'monitor_backups' => [
         [
             'name' => env('APP_NAME', 'laravel-backup'),
-            'disks' => ['local'],
+            'disks' => env('BACKUP_OFFSITE', false) ? ['local', 's3'] : ['local'],
             'health_checks' => [
                 MaximumAgeInDays::class => 1,
                 MaximumStorageInMegabytes::class => 5000,

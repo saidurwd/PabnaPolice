@@ -26,6 +26,7 @@ class HealthCheck
             'debug_mode' => $this->debugMode(...),
             'mail' => $this->mail(...),
             'backup' => $this->backup(...),
+            'offsite_backup' => $this->offsiteBackup(...),
             'disk_space' => $this->diskSpace(...),
         ] as $name => $check) {
             try {
@@ -129,6 +130,16 @@ class HealthCheck
         return $age > 36
             ? ['warn', 'Newest backup is '.round($age).' hours old']
             : ['ok', 'Newest backup is '.round($age).' hours old'];
+    }
+
+    /** @return array{0: string, 1: string} */
+    private function offsiteBackup(): array
+    {
+        $disks = (array) config('backup.backup.destination.disks');
+
+        return in_array('s3', $disks, true)
+            ? ['ok', 'Backups are also copied to the off-server disk']
+            : [app()->isProduction() ? 'warn' : 'ok', 'Backups only exist on this server: set BACKUP_OFFSITE=true (see .env.example) so losing the server does not lose the data'];
     }
 
     /** @return array{0: string, 1: string} */

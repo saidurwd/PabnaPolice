@@ -84,4 +84,60 @@ class OperationsTest extends TestCase
             $this->assertArrayHasKey($name, Artisan::all(), "{$name} is not a registered command");
         }
     }
+
+    public function test_csp_is_report_only_by_default_and_can_be_enforced_or_disabled(): void
+    {
+        $header = fn () => $this->get('/')->headers;
+
+        $h = $header();
+        $this->assertStringContainsString("default-src 'self'", (string) $h->get('Content-Security-Policy-Report-Only'));
+        $this->assertStringContainsString('report-uri', (string) $h->get('Content-Security-Policy-Report-Only'));
+        $this->assertNull($h->get('Content-Security-Policy'));
+
+        config(['security.csp_mode' => 'enforce']);
+        $h = $header();
+        $this->assertNotNull($h->get('Content-Security-Policy'));
+        $this->assertNull($h->get('Content-Security-Policy-Report-Only'));
+
+        config(['security.csp_mode' => 'off']);
+        $h = $header();
+        $this->assertNull($h->get('Content-Security-Policy'));
+        $this->assertNull($h->get('Content-Security-Policy-Report-Only'));
+    }
+
+    public function test_csp_extra_sources_are_added(): void
+    {
+        config(['security.csp_extra_sources' => 'https://cdn.example.org']);
+
+        $this->assertStringContainsString('script-src \'self\' \'unsafe-inline\' https://cdn.example.org', (string) $this->get('/')->headers->get('Content-Security-Policy-Report-Only'));
+    }
+
+    public function test_csp_violation_reports_are_accepted_without_a_csrf_token_and_logged(): void
+    {
+        $log = storage_path('logs/csp-'.now()->format('Y-m-d').'.log');
+        @unlink($log);
+
+        $this->call('POST', '/csp-report', [], [], [], ['CONTENT_TYPE' => 'application/csp-report'], json_encode([
+            'csp-report' => ['document-uri' => 'http://x.test/', 'effective-directive' => 'img-src', 'blocked-uri' => 'http://evil.test/a.png'],
+        ]))->assertNoContent();
+
+        $this->assertFileExists($log);
+        $this->assertStringContainsString('img-src', file_get_contents($log));
+        $this->assertStringContainsString('http://evil.test/a.png', file_get_contents($log));
+        @unlink($log);
+
+        // Garbage must not break it either.
+        $this->call('POST', '/csp-report', [], [], [], [], 'not json')->assertNoContent();
+        @unlink($log);
+    }
+
+    public function test_health_warns_when_backups_are_only_on_the_server_in_production(): void
+    {
+        $this->app['env'] = 'production';
+        config(['backup.backup.destination.disks' => ['local']]);
+        $this->assertSame('warn', (new HealthCheck)->run()['offsite_backup']['status']);
+
+        config(['backup.backup.destination.disks' => ['local', 's3']]);
+        $this->assertSame('ok', (new HealthCheck)->run()['offsite_backup']['status']);
+    }
 }

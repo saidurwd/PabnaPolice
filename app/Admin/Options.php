@@ -4,13 +4,9 @@ namespace App\Admin;
 
 use App\Models\BannerCategory;
 use App\Models\Category;
-use App\Models\City;
-use App\Models\Country;
-use App\Models\District;
 use App\Models\DocumentCategory;
 use App\Models\Menu;
 use App\Models\SiteLink;
-use App\Models\State;
 use App\Models\User;
 use App\Models\UserStatus;
 use Spatie\Permission\Models\Role;
@@ -36,10 +32,6 @@ class Options
             'roles' => Role::orderBy('name')->pluck('name', 'name')->all(),
             'user_statuses' => UserStatus::orderBy('id')->pluck('title', 'id')->all(),
             'users' => User::orderBy('full_name')->pluck('full_name', 'id')->all(),
-            'countries' => Country::orderBy('title')->pluck('title', 'id')->all(),
-            'states' => State::orderBy('title')->pluck('title', 'id')->all(),
-            'cities' => City::orderBy('title')->pluck('title', 'id')->all(),
-            'districts' => District::orderBy('title')->pluck('title', 'id')->all(),
             'menu_parents' => Menu::whereNull('parent_id')->orderBy('ordering')->pluck('title', 'id')->all(),
             'link_groups' => SiteLink::GROUPS,
             default => throw new \InvalidArgumentException("Unknown option source [{$source}]"),

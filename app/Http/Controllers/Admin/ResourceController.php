@@ -68,9 +68,6 @@ class ResourceController extends Controller
             if ($f['name'] === 'status_id') {
                 $model->status_id = 1;   // "Active" in user_statuses
             }
-            if ($f['name'] === 'country_id') {
-                $model->country_id = 18; // Bangladesh, the default in the legacy schema
-            }
         }
 
         return view('admin.resource.form', ['def' => $def, 'model' => $model]);

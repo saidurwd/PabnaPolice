@@ -4,7 +4,7 @@ Replaces the old Yii 1 application (a copy of its code is kept outside the repo 
 
 * **Website**: same design (Bootstrap 3 theme assets copied unchanged to `public/assets`), same `.html` URLs.
 * **Admin panel** at `/admin` (custom Blade + Bootstrap 5, no CDN): content, categories, banners/gallery, documents,
-  menus, users, groups and permissions, places, **site settings**, **site links** (every list that was hardcoded
+  menus, users, roles and permissions, **site settings**, **site links** (every list that was hardcoded
   in the old theme), feedback inbox and sign-in history.
 
 ## Data safety: how the live database is handled
@@ -36,7 +36,7 @@ The migrations up to this point are all additive. The **Phase 4** migrations (`2
 | 6 cleanup | drops the unused Yii session table | session blobs only |
 
 Each step compares row counts before/after and aborts on any difference. Tested on a copy of the real data: content, categories, banners,
-documents, users, menus, places and permissions came out identical under the new names, with all 23 tables' row counts equal.
+documents, users, menus and permissions came out identical under the new names, with every table's row count equal.
 The migration test on a copy of the live data showed `content`, `category`, `banner`, `document` and `user` byte-identical
 before/after; the only differences were the new tables, +3 `menu` rows and +36 `acl` rows.
 

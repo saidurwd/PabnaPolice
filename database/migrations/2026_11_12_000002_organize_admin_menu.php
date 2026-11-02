@@ -17,7 +17,6 @@ return new class extends Migration
         'documents' => ['Documents', 'bi-folder', 'Content', 30, ['Document Management']],
         'website' => ['Website', 'bi-globe2', 'Website', 50, []],
         'people' => ['Users & access', 'bi-people', 'Administration', 60, ['Access Control']],
-        'places' => ['Reference data', 'bi-geo-alt', 'Administration', 70, []],
         'advanced' => ['Advanced', 'bi-gear', 'Administration', 80, ['Configuration']],
     ];
 
@@ -40,11 +39,6 @@ return new class extends Migration
         ['people', 'Users', '/user', 'user', 1, ['/user/admin']],
         ['people', 'Roles & permissions', '/role', 'role', 2, ['/userGroup/admin', '/user-group']],
         ['people', 'Sign-in history', '/audit-trail', 'auditTrail', 3, ['/auditTrail/admin']],
-        ['places', 'Countries', '/country', 'Country', 1, ['/country/admin']],
-        ['places', 'States', '/state', 'State', 2, ['/state/admin']],
-        ['places', 'Cities', '/city', 'City', 3, ['/city/admin']],
-        ['places', 'Districts', '/district', 'District', 4, ['/district/admin']],
-        ['places', 'Thanas', '/thana', 'Thana', 5, ['/thana/admin']],
         ['advanced', 'Admin menu', '/menu', 'menu', 1, ['/menu/admin']],
         ['advanced', 'User statuses', '/user-status', 'userStatus', 2, ['/userStatus/admin']],
     ];

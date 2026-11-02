@@ -6,17 +6,12 @@ use App\Models\AuditTrail;
 use App\Models\Banner;
 use App\Models\BannerCategory;
 use App\Models\Category;
-use App\Models\City;
 use App\Models\Content;
-use App\Models\Country;
-use App\Models\District;
 use App\Models\Document;
 use App\Models\DocumentCategory;
 use App\Models\Feedback;
 use App\Models\Menu;
 use App\Models\SiteLink;
-use App\Models\State;
-use App\Models\Thana;
 use App\Models\User;
 use App\Models\UserStatus;
 
@@ -50,10 +45,6 @@ class ResourceRegistry
         $tree = fn (string $source, string $parentLabel = 'Parent') => [
             'name' => 'parent_id', 'label' => $parentLabel, 'type' => 'select', 'options' => $source,
             'rules' => 'nullable|integer', 'empty' => '— None (top level) —',
-        ];
-
-        $geo = fn (string $name, string $label, string $source) => [
-            'name' => $name, 'label' => $label, 'type' => 'select', 'options' => $source, 'rules' => 'required|integer',
         ];
 
         $list = [
@@ -239,66 +230,6 @@ class ResourceRegistry
                     ['name' => 'status', 'label' => 'Enabled', 'type' => 'bool', 'rules' => 'nullable|boolean'],
                 ],
                 'guard' => fn ($m) => Menu::where('parent_id', $m->id)->exists() ? 'It has child items.' : null,
-            ],
-            // ---------------------------------------------------------------- places
-            'country' => [
-                'model' => Country::class, 'title' => 'Country', 'plural' => 'Countries', 'icon' => 'bi-globe',
-                'order' => ['title', 'asc'], 'search' => ['title', 'country_2_code', 'country_3_code'],
-                'columns' => [['id', 'ID'], ['title', 'Country'], ['country_2_code', 'Code 2'], ['country_3_code', 'Code 3'], ['status', 'Status', 'badge']],
-                'fields' => [
-                    ['name' => 'title', 'label' => 'Country', 'type' => 'text', 'rules' => 'required|max:255'],
-                    ['name' => 'country_2_code', 'label' => 'Code 2', 'type' => 'text', 'rules' => 'nullable|max:2'],
-                    ['name' => 'country_3_code', 'label' => 'Code 3', 'type' => 'text', 'rules' => 'nullable|max:3'],
-                    $status,
-                ],
-                'guard' => fn ($m) => State::where('country_id', $m->id)->exists() ? 'It has states.' : null,
-            ],
-            'state' => [
-                'model' => State::class, 'title' => 'State', 'plural' => 'States', 'icon' => 'bi-geo',
-                'order' => ['title', 'asc'], 'search' => ['title'], 'filters' => ['country_id' => ['Country', 'countries']],
-                'columns' => [['id', 'ID'], ['title', 'State'], ['country_id', 'Country', 'option', 'countries'], ['state_2_code', 'Code 2'], ['status', 'Status', 'badge']],
-                'fields' => [
-                    $geo('country_id', 'Country', 'countries'),
-                    ['name' => 'title', 'label' => 'State', 'type' => 'text', 'rules' => 'required|max:192'],
-                    ['name' => 'state_2_code', 'label' => 'Code 2', 'type' => 'text', 'rules' => 'nullable|max:6'],
-                    ['name' => 'state_3_code', 'label' => 'Code 3', 'type' => 'text', 'rules' => 'nullable|max:9'],
-                    $status,
-                ],
-                'guard' => fn ($m) => City::where('state_id', $m->id)->exists() ? 'It has cities.' : null,
-            ],
-            'city' => [
-                'model' => City::class, 'title' => 'City', 'plural' => 'Cities', 'icon' => 'bi-building',
-                'order' => ['title', 'asc'], 'search' => ['title'], 'filters' => ['state_id' => ['State', 'states']],
-                'columns' => [['id', 'ID'], ['title', 'City'], ['state_id', 'State', 'option', 'states'], ['country_id', 'Country', 'option', 'countries'], ['status', 'Status', 'badge']],
-                'fields' => [
-                    $geo('country_id', 'Country', 'countries'), $geo('state_id', 'State', 'states'),
-                    ['name' => 'title', 'label' => 'City', 'type' => 'text', 'rules' => 'required|max:255'],
-                    ['name' => 'city_2_code', 'label' => 'Code 2', 'type' => 'text', 'rules' => 'nullable|max:6'],
-                    ['name' => 'city_3_code', 'label' => 'Code 3', 'type' => 'text', 'rules' => 'nullable|max:9'],
-                    $status,
-                ],
-                'guard' => fn ($m) => District::where('city_id', $m->id)->exists() ? 'It has districts.' : null,
-            ],
-            'district' => [
-                'model' => District::class, 'title' => 'District', 'plural' => 'Districts', 'icon' => 'bi-pin-map',
-                'order' => ['title', 'asc'], 'search' => ['title'], 'filters' => ['city_id' => ['City', 'cities']],
-                'columns' => [['id', 'ID'], ['title', 'District'], ['city_id', 'City', 'option', 'cities'], ['state_id', 'State', 'option', 'states'], ['status', 'Status', 'badge']],
-                'fields' => [
-                    $geo('country_id', 'Country', 'countries'), $geo('state_id', 'State', 'states'), $geo('city_id', 'City', 'cities'),
-                    ['name' => 'title', 'label' => 'District', 'type' => 'text', 'rules' => 'required|max:150'],
-                    $status,
-                ],
-                'guard' => fn ($m) => Thana::where('district_id', $m->id)->exists() ? 'It has thanas.' : null,
-            ],
-            'thana' => [
-                'model' => Thana::class, 'title' => 'Thana', 'plural' => 'Thanas', 'icon' => 'bi-shield',
-                'order' => ['title', 'asc'], 'search' => ['title'], 'filters' => ['district_id' => ['District', 'districts']],
-                'columns' => [['id', 'ID'], ['title', 'Thana'], ['district_id', 'District', 'option', 'districts'], ['city_id', 'City', 'option', 'cities'], ['status', 'Status', 'badge']],
-                'fields' => [
-                    $geo('country_id', 'Country', 'countries'), $geo('state_id', 'State', 'states'), $geo('city_id', 'City', 'cities'), $geo('district_id', 'District', 'districts'),
-                    ['name' => 'title', 'label' => 'Thana', 'type' => 'text', 'rules' => 'required|max:100'],
-                    $status,
-                ],
             ],
             // ---------------------------------------------------------------- logs (read-only)
             'audit-trail' => [

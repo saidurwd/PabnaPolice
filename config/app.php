@@ -26,6 +26,11 @@ return [
     |
     */
 
+    /*
+    | Version shown on the admin About page. Bump it (APP_VERSION in .env) when you deploy a release.
+    */
+    'version' => env('APP_VERSION', '1.0.0'),
+
     'env' => env('APP_ENV', 'production'),
 
     /*

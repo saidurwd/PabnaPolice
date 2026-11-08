@@ -15,6 +15,15 @@ class PermissionCatalog
 {
     public const ABILITIES = ['view', 'create', 'update', 'delete'];
 
+    /** Read-only admin pages that are not list/edit screens: slug => label and route name (used by the sidebar). */
+    public const PAGES = [
+        'audit-log' => ['label' => 'Audit log', 'route' => 'admin.audit-log'],
+        'activity-log' => ['label' => 'Activity log', 'route' => 'admin.activity-log'],
+        'security-events' => ['label' => 'Security events', 'route' => 'admin.security-events'],
+        'system-health' => ['label' => 'System health', 'route' => 'admin.system-health'],
+        'about' => ['label' => 'About', 'route' => 'admin.about'],
+    ];
+
     private const ACTION_TO_ABILITY = ['index' => 'view', 'create' => 'create', 'edit' => 'update', 'destroy' => 'delete'];
 
     /** @return array<string, array{label: string, abilities: array<int, string>}> module slug => details, in display order */
@@ -29,6 +38,10 @@ class PermissionCatalog
 
         $modules['settings'] = ['label' => 'Site settings', 'abilities' => ['view', 'update']];
         $modules['role'] = ['label' => 'Roles & permissions', 'abilities' => ['view', 'create', 'update', 'delete']];
+
+        foreach (self::PAGES as $slug => $page) {
+            $modules[$slug] = ['label' => $page['label'], 'abilities' => ['view']];
+        }
 
         return $modules;
     }

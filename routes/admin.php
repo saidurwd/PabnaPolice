@@ -5,10 +5,12 @@ use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EditorUploadController;
+use App\Http\Controllers\Admin\LogController;
 use App\Http\Controllers\Admin\PasswordResetController;
 use App\Http\Controllers\Admin\ResourceController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\SystemController;
 use App\Http\Controllers\Admin\TwoFactorChallengeController;
 use Illuminate\Support\Facades\Route;
 
@@ -42,6 +44,12 @@ Route::middleware('admin.auth')->group(function () {
     Route::middleware('admin.can')->group(function () {
         Route::get('settings', [SettingController::class, 'edit'])->name('settings')->defaults('permission', 'settings.view');
         Route::put('settings', [SettingController::class, 'update'])->name('settings.update')->defaults('permission', 'settings.update');
+
+        Route::get('audit-log', [LogController::class, 'audit'])->name('audit-log')->defaults('permission', 'audit-log.view');
+        Route::get('activity-log', [LogController::class, 'activity'])->name('activity-log')->defaults('permission', 'activity-log.view');
+        Route::get('security-events', [LogController::class, 'security'])->name('security-events')->defaults('permission', 'security-events.view');
+        Route::get('system-health', [SystemController::class, 'health'])->name('system-health')->defaults('permission', 'system-health.view');
+        Route::get('about', [SystemController::class, 'about'])->name('about')->defaults('permission', 'about.view');
 
         Route::post('editor-upload', EditorUploadController::class)->name('editor-upload')->defaults('permission', 'content.create');
 

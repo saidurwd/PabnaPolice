@@ -1,3 +1,11 @@
+@font-face {
+    font-family: 'Nikosh';
+    src: url(../fonts/Nikosh.ttf) format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 .bg_grad_5 {
     background: -webkit-linear-gradient(235deg, rgba(255,255,255,0.0)10%, rgba(255,255,255,0.2)20%, rgba(19,27,67,1)70%), -webkit-linear-gradient(305deg, rgba(150,150,255,0.0)80%, rgba(60,111,162,0.8)20%), -webkit-linear-gradient(325deg, rgba(255,255,255,0.0)70%, rgba(60,111,190,0.7)30%), -webkit-linear-gradient(290deg, rgba(60,111,180,0.9)60%, rgba(60,111,190,0.8)40%) !important;
     background: -o-linear-gradient(235deg, rgba(255,255,255,0.0)10%, rgba(255,255,255,0.2)20%, rgba(19,27,67,1)70%), -o-linear-gradient(305deg, rgba(150,150,255,0.0)80%, rgba(60,111,162,0.8)20%), -o-linear-gradient(325deg, rgba(255,255,255,0.0)70%, rgba(60,111,190,0.7)30%), -o-linear-gradient(290deg, rgba(60,111,180,0.9)60%, rgba(60,111,190,0.8)40%) !important;
@@ -212,8 +220,7 @@
         padding: 0 14px 0 0 !important;
     }
 }
-<style>
-  /* Model css */
+/* Model css */
   .black_overlay {
     position: fixed;
     width: 100%;
@@ -304,4 +311,365 @@
       position: relative;
     }
   }
-</style>
+
+/* ===== Header icons: Election & 999 (from police.gov.bd) ===== */
+   HEADER ICONS - ELECTION & 999
+   COMPLETE MOBILE RESPONSIVE FIX
+   ======================================== */
+
+/* Container for both icons */
+.header-icons-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+/* Election Logo - Default (Desktop) */
+.election-logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5px !important;
+}
+
+.election-logo {
+    width: 140px;
+    height: 110px;
+    object-fit: contain;
+    transition: all 0.3s ease;
+    display: block;
+
+}
+
+.election-logo:hover {
+    opacity: 0.75;
+    transform: scale(1.02);
+}
+
+/* 999 Emergency Logo - Default (Desktop) */
+.emergency-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.emergency-logo {
+    width: 91px;
+    height: 76px;
+    object-fit: contain;
+    transition: all 0.3s ease;
+    display: block;
+}
+
+.emergency-logo:hover {
+    opacity: 0.75;
+    transform: scale(1.02);
+}
+
+/* ========================================
+   TABLET VIEW (max-width: 992px)
+   ======================================== */
+@media only screen and (max-width: 992px) {
+    .header-icons-container {
+        gap: 12px;
+    }
+    
+    .election-logo {
+        width: 200px;
+        height: 160px;
+    }
+    
+    .emergency-logo {
+        width: 140px;
+        height: 116px;
+    }
+}
+
+/* ========================================
+   MOBILE VIEW (max-width: 768px)
+   ======================================== */
+@media only screen and (max-width: 768px) {
+    /* Container - Side by side, centered */
+    .header-icons-container {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 10px !important;
+        flex-wrap: nowrap !important;
+        width: 100% !important;
+        padding: 5px 0 !important;
+    }
+    
+    /* Both containers - side by side */
+    .election-logo-container,
+    .emergency-container {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex: 0 0 auto !important;
+        width: auto !important;
+    }
+    
+    /* Election Logo - Smaller size */
+    .election-logo {
+        width: 130px !important;
+        height: 110px !important;
+        object-fit: contain !important;
+        display: block !important;
+        margin: 0 !important;
+    }
+    
+    /* 999 Emergency Logo - Smaller size */
+    .emergency-logo {
+        width: 100px !important;
+        height: 84px !important;
+        object-fit: contain !important;
+        display: block !important;
+        margin: 0 !important;
+    }
+    
+    /* Remove any extra spacing */
+    .election-logo-container a,
+    .emergency-container a {
+        display: block !important;
+        line-height: 0 !important;
+    }
+    
+    /* Ensure no extra margins */
+    .pull-right {
+        display: flex !important;
+        justify-content: center !important;
+        width: 100% !important;
+        padding-right: 0 !important;
+    }
+}
+
+/* ========================================
+   EXTRA SMALL DEVICES (max-width: 480px)
+   ======================================== */
+@media only screen and (max-width: 480px) {
+    .header-icons-container {
+        gap: 8px !important;
+        padding: 3px 0 !important;
+    }
+    
+    /* Even smaller for very small screens */
+    .election-logo {
+        width: 100px !important;
+        height: 84px !important;
+    }
+    
+    .emergency-logo {
+        width: 40px !important;
+        height: 34px !important;
+    }
+}
+
+/* ========================================
+   VERY SMALL DEVICES (max-width: 360px)
+   ======================================== */
+@media only screen and (max-width: 360px) {
+    .election-logo {
+        width: 84px !important;
+        height: 72px !important;
+    }
+    
+    .emergency-logo {
+        width: 68px !important;
+        height: 54px !important;
+    }
+    
+    .header-icons-container {
+        gap: 6px !important;
+    }
+}
+
+/* ========================================
+   FORCE OVERRIDE - No display: block issues
+   ======================================== */
+.election-logo-container,
+.emergency-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Fix for col-xs-12 text-right on mobile */
+@media only screen and (max-width: 768px) {
+    .text-right.no-padding-right {
+        text-align: center !important;
+        padding-right: 15px !important;
+        padding-left: 15px !important;
+    }
+    
+    .col-xs-12.text-right {
+        text-align: center !important;
+    }
+}
+
+/* ===== Sidebar: cyber support, partner links, emergency numbers (from police.gov.bd) ===== */
+/* ===== SIDEBAR ===== */
+.csforw {
+    background: linear-gradient(341deg, #19fbea 0%, #1d264f 100%) !important;
+    border-radius: 10px;
+    padding: 10px 0;
+}
+.women-title {
+    font-size: 15px;
+    color: #fff;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 10px;
+}
+.women-title:hover { color: wheat; }
+.women-link a {
+    color: #fff;
+    font-size: 14px;
+    text-align: left !important;
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 5px;
+}
+.women-link a:hover { color: wheat; }
+#cyber-email {
+    color: floralwhite;
+    margin-top: 10px;
+    font-size: 11px !important;
+    word-break: break-all;
+}
+.cyber-w-img img { width: 100%; margin-top: 10px; }
+.fire-service-box {
+    padding: 20px 10px 15px 10px;
+    border-radius: 10px;
+}
+.sidebar-link-box {
+    height: 75px;
+    line-height: 75px;
+    border-radius: 8px;
+}
+.sidebar-link-box-iacp {
+    height: 90px;
+    line-height: 20px;
+    border-radius: 8px;
+}
+.sidebar-widget {
+    margin-top: 15px;
+    border-radius: 5px;
+}
+
+/* ===== EMERGENCY CONTACT ===== */
+.emergency-contact-wrapper { margin-top: 15px; }
+.emergency-btn-wrapper { margin-bottom: 15px; }
+#emergencyContactBtn {
+    width: 100%;
+    background: linear-gradient(135deg, #be1e2d, #d73739);
+    border: none;
+    padding: 10px 37px;
+    border-radius: 7px;
+    font-size: 20px;
+    font-weight: 600;
+    box-shadow: 0 5px 20px rgba(190, 30, 45, 0.4);
+}
+.emergency-preview { margin-top: 15px; padding: 0 5px; }
+.emergency-preview-col { padding: 0 5px; margin-bottom: 10px; }
+.emergency-preview-item {
+    background: #fff;
+    border-radius: 5px;
+    padding: 6px 9px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    border: 1px solid #eef2f6;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s;
+    min-height: 75px;
+    width: 100%;
+}
+.emergency-preview-img {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f0f2f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.emergency-preview-img img { width: 100%; height: 100%; object-fit: contain; }
+.emergency-preview-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.emergency-service-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e2a6e;
+}
+.emergency-number {
+    font-size: 18px;
+    font-weight: 700;
+    color: #be1e2d;
+}
+.emergency-number .fa-phone { font-size: 15px; margin-right: 8px; }
+.emergency-link-icon { font-size: 12px; margin-right: 6px; color: #1e2a6e; }
+.emergency-visit-link { color: #be1e2d; text-decoration: none; }
+.emergency-visit-link .fa-arrow-right { font-size: 12px; margin-left: 4px; }
+.emergency-toggle-wrapper { margin-top: 10px; }
+.emergency-toggle-btn {
+    background: #1e2a6e;
+    color: white;
+    border: none;
+    padding: 8px 35px;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: all 0.3s;
+    font-weight: 500;
+    width: 100%;
+}
+@media (max-width: 767px) {
+    .csforw { padding: 10px 0 !important; }
+    .women-title { font-size: 14px !important; }
+    .women-link a { font-size: 12px !important; }
+    .cyber-w-img img { width: 100px !important; height: auto; margin-top: 10px; }
+    .fire-service-box { padding: 10px !important; }
+    .fire-service-box h1 { font-size: 18px !important; }
+    .fire-service-box .size-20 { font-size: 14px !important; }
+    .sidebar-link-box { height: 60px !important; line-height: 60px !important; }
+    .sidebar-link-box .size-20 { font-size: 14px !important; }
+    .sidebar-link-box-iacp { height: 70px !important; line-height: 18px !important; }
+    .sidebar-link-box-iacp .size-16 { font-size: 12px !important; }
+    .sidebar-widget { margin-top: 10px !important; }
+    .sidebar-widget h1 { font-size: 16px !important; padding: 8px 0 !important; }
+    .sidebar-widget .widget_description a { font-size: 12px !important; padding: 8px 10px !important; }
+
+    /* ----- EMERGENCY CONTACT ----- */
+    #emergencyContactBtn { font-size: 16px !important; padding: 8px 20px !important; }
+    .emergency-preview-item { min-height: 55px !important; padding: 4px 8px !important; gap: 10px !important; }
+    .emergency-preview-img { width: 30px !important; height: 30px !important; }
+    .emergency-service-name { font-size: 12px !important; }
+    .emergency-number { font-size: 14px !important; }
+    .emergency-number .fa-phone { font-size: 12px !important; }
+    .emergency-visit-link { font-size: 11px !important; }
+    .emergency-toggle-btn { font-size: 12px !important; padding: 6px 15px !important; }
+}
+
+/* ===== Header: the banner stays full width. Election + 999 badges sit in the banner's blank left area on wide
+   screens (>=1200px) and form a small centred row under the banner on smaller screens ===== */
+#topends { position: relative; }
+#topends .fr_lr, #topends .container-fluid, #topends [class*="col-"] { position: static; }
+.header-badges { padding: 0 !important; }
+.header-badges .header-icons-container { display: flex; flex-wrap: nowrap; justify-content: center; align-items: center; gap: 12px; padding: 6px 0; }
+.header-badges .header-badge-img { width: auto !important; height: 55px !important; max-width: none !important; }
+@media (min-width: 1200px) {
+    #topends .header-badges { position: absolute; top: 4px; left: calc((100% - min(100%, 1260px)) / 2 + 14px); width: auto; z-index: 5; }
+    .header-badges .header-icons-container { gap: 8px; padding: 0; }
+    .header-badges .header-badge-img { height: 90px !important; }
+}
+@media (max-width: 1199px) { #topends.logo_bar { height: auto; } }

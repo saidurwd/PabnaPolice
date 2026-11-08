@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Admin\ResourceRegistry;
+use App\Support\Logs\Security;
 use Closure;
 use Illuminate\Http\Request;
 
@@ -30,7 +31,10 @@ class AuthorizeResource
             $request->attributes->set('resource', $def);
         }
 
-        abort_unless($request->user()?->can($permission), 403);
+        if (! $request->user()?->can($permission)) {
+            Security::record('permission_denied', Security::WARNING, "Access denied to {$request->method()} /{$request->path()} (needs {$permission})", null, null, ['permission' => $permission]);
+            abort(403);
+        }
 
         return $next($request);
     }

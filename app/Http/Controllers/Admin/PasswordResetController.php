@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Support\LegacyPassword;
+use App\Support\Logs\Security;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
@@ -24,6 +25,7 @@ class PasswordResetController extends Controller
 
         // Same answer whether or not the address exists, so the form can't be used to find accounts.
         Password::sendResetLink($request->only('email'));
+        Security::record('password_reset_requested', Security::INFO, 'Password reset link requested', null, $request->input('email'));
 
         return back()->with('success', 'If that address belongs to an account, a password reset link has been sent to it.');
     }
@@ -47,6 +49,7 @@ class PasswordResetController extends Controller
             $user->save();
 
             event(new PasswordReset($user));
+            Security::record('password_reset_completed', Security::WARNING, 'Password was reset with an e-mailed link', $user->id, $user->username);
         });
 
         return $status === Password::PasswordReset

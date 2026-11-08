@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Support\Logs\Activity;
 use Illuminate\Http\Request;
 
 class SettingController extends Controller
@@ -27,8 +28,15 @@ class SettingController extends Controller
         }
         $data = $request->validate($rules);
 
+        $changed = [];
         foreach ($data as $name => $value) {
+            if ((string) Setting::get($name) !== (string) $value) {
+                $changed[] = $name;
+            }
             Setting::put($name, $value);
+        }
+        if ($changed) {
+            Activity::record('settings_updated', 'Saved site settings ('.count($changed).' changed)', ['changed' => $changed]);
         }
 
         return back()->with('success', 'Settings saved.');

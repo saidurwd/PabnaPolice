@@ -19,7 +19,8 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <!--CSS-->
-        <link rel="stylesheet" href="{{ theme_asset('bootstrap-3.3.7-dist/css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ theme_asset('bootstrap-5.3.8-dist/css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ theme_asset('css/bs3-compat.css') }}">
         <link rel="stylesheet" href="{{ theme_asset('slick-master/slick/slick.css') }}">
         <link rel="stylesheet" href="{{ theme_asset('slick-master/slick/slick-theme.css') }}">
         <link rel="stylesheet" href="{{ theme_asset('fonts/font-awesome-4.7.0/css/font-awesome.css') }}">
@@ -29,7 +30,7 @@
         <link rel="stylesheet" href="{{ theme_asset('css/custom-styles.css') }}">
         <!--Scripts-->
         <script src="{{ theme_asset('js/jquery-3.2.0.min.js') }}"></script>
-        <script src="{{ theme_asset('bootstrap-3.3.7-dist/js/bootstrap.min.js') }}"></script>
+        <script src="{{ theme_asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
         <script src="{{ theme_asset('slick-master/slick/slick.js') }}"></script>
         <script src="{{ theme_asset('js/jquery.nav.js') }}"></script>
         <script src="{{ theme_asset('js/lightbox.js') }}"></script>
@@ -46,16 +47,31 @@
     <body class="relative">
 
         <x-front.side-panels :links="$links" />
+        <x-front.accessibility />
 
         <div class="container-fluid  bg_gray_white_gray border_bottom_5 common-pages">
             <div class="row">
                 <!--- logo bar --->
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 logo_bar lgbar bg_grad_5" id="topends">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-12 logo_bar lgbar bg_grad_5" id="topends">
                     <div class="fr_lr">
                         <div class="container-fluid">
-                            <div class="col-md-12">
-                                <div class="col-md-12 col-sm-12 col-xs-12 text-left">
-                                    <img src="{{ $headerBanner ? $headerBanner->imageUrl() : asset('uploads/banner/default.jpg') }}" alt="{{ $headerBanner?->title }}" title="{{ $headerBanner?->title }}" class="img-responsive">
+                            <div class="col-lg-12">
+                                <!-- Left part [logo] -->
+                                <div class="col-lg-12 col-12 text-start">
+                                    <img src="{{ $headerBanner ? $headerBanner->imageUrl() : asset('uploads/banner/default.jpg') }}" alt="{{ $headerBanner?->title }}" title="{{ $headerBanner?->title }}" class="img-fluid">
+                                </div>
+                                <!-- Right part [Election Commission + 999] -->
+                                <div class="col-lg-12 col-12 text-center header-badges">
+                                    <div class="header-icons-container">
+                                        @foreach ($links->get('header_badges', []) as $l)
+                                            <div class="header-badge">
+                                                <a href="{{ $l->href() }}" target="_blank" rel="noopener" title="{{ $l->title }}">
+                                                    <img src="{{ $l->imageUrl() }}" class="img-fluid header-badge-img" alt="{{ $l->title }}">
+                                                </a>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <div class="clearfix"></div>
                                 </div>
                             </div>
                         </div>

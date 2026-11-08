@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Support\LegacyPassword;
+use App\Support\Logs\Activity;
+use App\Support\Logs\Security;
 use App\Support\TwoFactor;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -35,6 +37,7 @@ class AccountController extends Controller
         ]);
 
         $user->update($data);
+        Activity::record('profile_updated', 'Updated own profile');
 
         return back()->with('success', 'Profile updated.');
     }
@@ -51,6 +54,8 @@ class AccountController extends Controller
 
         $user->password = LegacyPassword::make($request->input('password'));
         $user->save();
+        Security::record('password_changed', Security::INFO, 'Password changed from the account page', $user->id, $user->username);
+        Activity::record('password_changed', 'Changed own password');
 
         return back()->with('success', 'Password changed.');
     }
@@ -81,6 +86,7 @@ class AccountController extends Controller
         $user->two_factor_confirmed_at = now();
         $user->two_factor_recovery_codes = $codes;
         $user->save();
+        Security::record('two_factor_enabled', Security::INFO, 'Two-factor authentication turned on', $user->id, $user->username);
 
         return back()->with('success', 'Two-factor authentication is on.')->with('recovery_codes', $codes);
     }
@@ -95,6 +101,7 @@ class AccountController extends Controller
         $codes = $twoFactor->recoveryCodes();
         $user->two_factor_recovery_codes = $codes;
         $user->save();
+        Security::record('two_factor_enabled', Security::INFO, 'Two-factor recovery codes regenerated', $user->id, $user->username);
 
         return back()->with('success', 'New recovery codes created. The old ones no longer work.')->with('recovery_codes', $codes);
     }
@@ -109,6 +116,7 @@ class AccountController extends Controller
         $user->two_factor_recovery_codes = null;
         $user->two_factor_confirmed_at = null;
         $user->save();
+        Security::record('two_factor_disabled', Security::WARNING, 'Two-factor authentication turned off', $user->id, $user->username);
 
         return back()->with('success', 'Two-factor authentication is off.');
     }

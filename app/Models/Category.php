@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\YesNo;
+use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -10,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Category extends CategoryNode
 {
+    use Auditable;
+
     protected function casts(): array
     {
         return parent::casts() + ['listing' => YesNo::class];

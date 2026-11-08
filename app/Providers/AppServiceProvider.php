@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
         // Password-reset e-mails link to the admin panel's reset page.
         ResetPassword::createUrlUsing(fn ($user, string $token) => route('admin.password.reset', ['token' => $token, 'email' => $user->getEmailForPasswordReset()]));
 
-        Paginator::defaultView('pagination::bootstrap-3');
+        Paginator::useBootstrapFive();
         View::composer(['front.*', 'errors::404'], FrontComposer::class);
         //
     }

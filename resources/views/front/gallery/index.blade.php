@@ -8,7 +8,7 @@
         @endif
         <div class="items">
             @forelse ($rows as $b)
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6" style="margin-bottom: 10px;">
+                <div class="col-xl-3 col-lg-3 col-md-6 col-6" style="margin-bottom: 10px;">
                     <a class="border-radius-50-prcnt overflow-hidden text-center img_anchor_1" data-lightbox="default" data-title="{{ $b->title }}" href="{{ asset('uploads/banner/'.$b->banner) }}">
                         <img src="{{ asset('uploads/banner/'.$b->banner) }}" alt="{{ $b->title }}" class="width_full" title="{{ $b->title }}">
                     </a>

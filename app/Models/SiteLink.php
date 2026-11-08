@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\Status;
+use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -20,6 +21,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class SiteLink extends Model
 {
+    use Auditable;
+
     protected $guarded = ['id'];
 
     public const GROUPS = [
@@ -32,6 +35,9 @@ class SiteLink extends Model
         'govt_links' => 'Home widget: Important Govt. Websites',
         'important' => 'Home: Important links tiles',
         'footer_links' => 'Footer links',
+        'header_badges' => 'Header: logo badges (e.g. Election, 999)',
+        'partner_links' => 'Home sidebar: partner organisations (INTERPOL, UN …)',
+        'emergency' => 'Home sidebar: emergency numbers',
     ];
 
     protected function casts(): array

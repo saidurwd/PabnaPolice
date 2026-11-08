@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -11,6 +12,9 @@ use Throwable;
  */
 class HealthCheck
 {
+    /** Cache key the scheduler refreshes every minute (see routes/console.php). */
+    public const HEARTBEAT_KEY = 'scheduler.heartbeat';
+
     /** @return array<string, array{status: string, message: string}> */
     public function run(): array
     {
@@ -28,6 +32,8 @@ class HealthCheck
             'backup' => $this->backup(...),
             'offsite_backup' => $this->offsiteBackup(...),
             'disk_space' => $this->diskSpace(...),
+            'scheduler' => $this->scheduler(...),
+            'php_extensions' => $this->phpExtensions(...),
         ] as $name => $check) {
             try {
                 [$status, $message] = $check();
@@ -158,5 +164,31 @@ class HealthCheck
         $gb = round($free / 1073741824, 1);
 
         return $free < 200 * 1048576 ? ['fail', "Only {$gb} GB free"] : ($free < 1073741824 ? ['warn', "Only {$gb} GB free"] : ['ok', "{$gb} GB free"]);
+    }
+
+    /** @return array{0: string, 1: string} */
+    private function scheduler(): array
+    {
+        $beat = Cache::get(self::HEARTBEAT_KEY);
+
+        if (! $beat) {
+            return [app()->isProduction() ? 'warn' : 'ok', 'The scheduler has not run yet: nightly backups and log pruning need `* * * * * php artisan schedule:run` in cron'];
+        }
+
+        $minutes = (int) round((time() - (int) $beat) / 60);
+
+        return $minutes > 15
+            ? ['warn', "The scheduler last ran {$minutes} minutes ago: is the cron job still running?"]
+            : ['ok', 'The scheduler ran '.($minutes < 1 ? 'less than a minute' : "{$minutes} minute(s)").' ago'];
+    }
+
+    /** @return array{0: string, 1: string} */
+    private function phpExtensions(): array
+    {
+        $missing = array_filter(['mbstring', 'pdo_mysql', 'fileinfo', 'gd', 'zip', 'openssl', 'ctype', 'tokenizer'], fn ($e) => ! extension_loaded($e));
+
+        return $missing
+            ? ['fail', 'Missing PHP extension(s): '.implode(', ', $missing)]
+            : ['ok', 'All required PHP extensions are loaded'];
     }
 }

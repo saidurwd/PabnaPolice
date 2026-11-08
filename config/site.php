@@ -39,6 +39,14 @@ return [
         'map_heading' => ['label' => 'Map section heading', 'type' => 'text', 'default' => 'গুগল ম্যাপে পাবনা জেলা পুলিশ সুপারের কর্যালয়'],
         'map_embed_url' => ['label' => 'Google Maps embed URL', 'type' => 'textarea', 'default' => 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3638.530841145013!2d89.27887201446494!3d24.22320567646765!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39fc28d9982528eb%3A0x6771ffe3ebc22398!2z4Kaq4KeB4Kay4Ka_4Ka2IOCmuOCngeCmquCmvuCmsCDgpoXgpqvgpr_gprg!5e0!3m2!1sbn!2sbd!4v1596615727600!5m2!1sbn!2sbd'],
     ],
+    'Home sidebar' => [
+        'cyber_title' => ['label' => 'Cyber support card: title', 'type' => 'text', 'default' => 'Police Cyber Support For Women'],
+        'cyber_title_url' => ['label' => 'Cyber support card: title link', 'type' => 'url', 'default' => 'https://www.police.gov.bd/en/police_cyber_support_for_women'],
+        'cyber_phone' => ['label' => 'Cyber support card: phone', 'type' => 'text', 'default' => '01320000888'],
+        'cyber_facebook_label' => ['label' => 'Cyber support card: Facebook label', 'type' => 'text', 'default' => '/PCSW.PHQ'],
+        'cyber_facebook_url' => ['label' => 'Cyber support card: Facebook URL', 'type' => 'url', 'default' => 'https://www.facebook.com/PCSW.PHQ/'],
+        'cyber_email' => ['label' => 'Cyber support card: e-mail', 'type' => 'text', 'default' => 'cybersupport.women@police.gov.bd'],
+    ],
     'Navigation' => [
         'nav_categories' => ['label' => 'Main menu categories (Category IDs, comma separated, in order)', 'type' => 'text', 'default' => '6,14,8,7,9,13,10,12', 'help' => 'Each becomes a drop-down listing its contents and sub-categories.'],
         'nav_listing_categories' => ['label' => 'Main menu: drop-downs that show sub-category contents (Category IDs, comma separated)', 'type' => 'text', 'default' => '6', 'help' => 'For these menus, sub-categories with "Show sub-menu listing = Yes" expand to list their contents.'],

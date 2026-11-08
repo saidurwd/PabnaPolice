@@ -1,12 +1,12 @@
 @props(['nav', 'navGallery', 'navDocument'])
                 <!--- nav bar --->
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 nav_bar bg_red_gradient_site" id="mainnav">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-12 nav_bar bg_red_gradient_site" id="mainnav">
                     <div class="fr_lr">
                         <nav class="navbar">
                             <div class="container-fluid">
-                                <div class="col-md-12">
+                                <div class="col-lg-12">
                                     <div class="navbar-header no-padding bg_black text-center">
-                                        <div class="navbar-toggle no-padding padding-0-10 white nvcollapse cursor-pointer no-float" data-toggle="collapse" data-target="#nav2">
+                                        <div class="navbar-toggle no-padding padding-0-10 white nvcollapse cursor-pointer no-float" data-bs-toggle="collapse" data-bs-target="#nav2">
                                             <i class="fa fa-bars" aria-hidden="true"></i> Menu <i class="fa fa-bars" aria-hidden="true"></i>
                                         </div>
                                     </div>

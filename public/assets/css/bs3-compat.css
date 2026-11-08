@@ -1,0 +1,83 @@
+/*
+ * Bootstrap 3 -> 5 compatibility layer for the public theme.
+ * Loaded after bootstrap 5.3.x and before styles.css. It restores the few Bootstrap 3 behaviours the
+ * legacy theme (and HTML stored in the CMS) still relies on. Remove pieces once nothing needs them.
+ * Breakpoints: BS3 xs/sm/md/lg (<768 / 768 / 992 / 1200) == BS5 (none) / md / lg / xl.
+ */
+
+/* ---- Base typography (BS3 reboot) ---- */
+html { font-size: 10px; -webkit-tap-highlight-color: rgba(0,0,0,0); }
+body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.42857143; color: #333; background-color: #fff; }
+a { color: #337ab7; text-decoration: none; }
+a:hover, a:focus { color: #23527c; text-decoration: underline; }
+p { margin: 0 0 10px; }
+ul, ol { margin-top: 0; margin-bottom: 10px; }
+img { vertical-align: middle; }
+label { display: inline-block; max-width: 100%; margin-bottom: 5px; font-weight: 700; }
+h1, h2, h3, h4, h5, h6 { font-family: inherit; font-weight: 500; line-height: 1.1; color: inherit; }
+h1 { font-size: 36px; } h2 { font-size: 30px; } h3 { font-size: 24px; } h4 { font-size: 18px; } h5 { font-size: 14px; } h6 { font-size: 12px; }
+table { background-color: transparent; }
+th { text-align: left; }
+.table { --bs-table-bg: transparent; margin-bottom: 20px; }
+.table > :not(caption) > * > * { padding: 8px; }
+.form-control { font-size: 14px; line-height: 1.42857143; padding: 6px 12px; height: 34px; border-radius: 4px; }
+textarea.form-control { height: auto; }
+.btn { font-size: 14px; line-height: 1.42857143; padding: 6px 12px; border-radius: 4px; }
+.btn-lg { font-size: 18px; line-height: 1.3333333; padding: 10px 16px; border-radius: 6px; }
+.btn-sm { font-size: 12px; line-height: 1.5; padding: 5px 10px; border-radius: 3px; }
+
+/* ---- Grid: BS3 floated columns with 15px gutters, also outside a .row ---- */
+.container, .container-fluid { --bs-gutter-x: 30px; }
+.row { --bs-gutter-x: 30px; --bs-gutter-y: 0; align-items: flex-start; }
+.container::after, .container-fluid::after { content: ""; display: table; clear: both; }
+@media (min-width: 768px)  { .container { max-width: 750px; } }
+@media (min-width: 992px)  { .container { max-width: 970px; } }
+@media (min-width: 1200px) { .container { max-width: 1170px; } }
+
+/* every column: positioned, padded, min-height (flex items inside .row ignore the float) */
+.col-1,.col-2,.col-3,.col-4,.col-5,.col-6,.col-7,.col-8,.col-9,.col-10,.col-11,.col-12,.col-md-1,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-10,.col-md-11,.col-md-12,.col-lg-1,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-10,.col-lg-11,.col-lg-12,.col-xl-1,.col-xl-2,.col-xl-3,.col-xl-4,.col-xl-5,.col-xl-6,.col-xl-7,.col-xl-8,.col-xl-9,.col-xl-10,.col-xl-11,.col-xl-12{position:relative;min-height:1px;padding-right:15px;padding-left:15px}
+.col-1,.col-2,.col-3,.col-4,.col-5,.col-6,.col-7,.col-8,.col-9,.col-10,.col-11,.col-12{float:left}
+@media (min-width:768px){.col-md-1,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-10,.col-md-11,.col-md-12{float:left}}
+@media (min-width:992px){.col-lg-1,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-10,.col-lg-11,.col-lg-12{float:left}}
+@media (min-width:1200px){.col-xl-1,.col-xl-2,.col-xl-3,.col-xl-4,.col-xl-5,.col-xl-6,.col-xl-7,.col-xl-8,.col-xl-9,.col-xl-10,.col-xl-11,.col-xl-12{float:left}}
+
+/* ---- Navbar / dropdown (BS3 markup used by the theme's main menu) ---- */
+.navbar { display: block; position: relative; padding: 0; margin-bottom: 20px; border: 1px solid transparent; min-height: 50px; }
+.navbar::after, .navbar-header::after, .navbar-collapse::after { content: ""; display: table; clear: both; }
+.navbar > .container, .navbar > .container-fluid { display: block; }
+.navbar-header { float: none; }
+.navbar-toggle { position: relative; float: right; display: none; margin: 8px 15px 8px 0; padding: 9px 10px; background-color: transparent; border: 1px solid transparent; border-radius: 4px; }
+.navbar-collapse { padding-right: 15px; padding-left: 15px; overflow-x: visible; border-top: 1px solid transparent; box-shadow: inset 0 1px 0 rgba(255,255,255,.1); }
+.navbar-collapse.show { display: block; }
+.navbar-nav { display: block; flex-direction: row; margin: 0; padding-left: 0; list-style: none; float: left; }
+.nav { display: block; padding-left: 0; margin-bottom: 0; list-style: none; flex-wrap: nowrap; }
+.nav > li { position: relative; display: block; }
+.nav > li > a { position: relative; display: block; padding: 10px 15px; }
+.navbar-nav > li { float: left; }
+.navbar-nav > li > a { padding-top: 15px; padding-bottom: 15px; line-height: 20px; }
+.dropdown { position: relative; }
+.dropdown-menu { position: absolute; top: 100%; left: 0; z-index: 1000; display: none; float: left; min-width: 160px; padding: 5px 0; margin: 2px 0 0; font-size: 14px; text-align: left; list-style: none; background-color: #fff; border: 1px solid rgba(0,0,0,.15); border-radius: 4px; box-shadow: 0 6px 12px rgba(0,0,0,.175); background-clip: padding-box; }
+.dropdown-menu > li > a { display: block; padding: 3px 20px; clear: both; font-weight: 400; line-height: 1.42857143; color: #333; white-space: nowrap; }
+@media (min-width: 768px) {
+  .navbar-collapse.collapse { display: block !important; height: auto !important; padding-bottom: 0; overflow: visible !important; }
+  .navbar-header { float: left; }
+}
+
+/* ---- Legacy helper classes (templates + CMS-authored HTML) ---- */
+.img-responsive { display: block; max-width: 100%; height: auto; }
+.pull-right { float: right !important; }
+.pull-left { float: left !important; }
+.center-block { display: block; margin-right: auto; margin-left: auto; }
+.text-left { text-align: left !important; }
+.text-right { text-align: right !important; }
+.text-justify { text-align: justify !important; }
+.clearfix::before { content: " "; display: table; }
+.in { display: block; }
+.hidden-xs { display: none !important; } @media (min-width:768px){.hidden-xs{display:revert !important}}
+@media (min-width:768px) and (max-width:991px){.hidden-sm{display:none !important}}
+@media (min-width:992px) and (max-width:1199px){.hidden-md{display:none !important}}
+@media (min-width:1200px){.hidden-lg{display:none !important}}
+.alert-dismissable { padding-right: 35px; }
+.btn-primary { --bs-btn-bg: #337ab7; --bs-btn-border-color: #2e6da4; --bs-btn-hover-bg: #286090; --bs-btn-hover-border-color: #204d74; --bs-btn-active-bg: #286090; --bs-btn-active-border-color: #204d74; }
+/* the theme hides .navbar-collapse.collapse below 1200px with !important; let the open state (.show) win */
+@media screen and (max-width: 1200px) { .navbar-collapse.collapse.show { display: block !important; } }

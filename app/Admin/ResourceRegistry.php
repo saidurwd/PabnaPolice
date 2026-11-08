@@ -161,10 +161,10 @@ class ResourceRegistry
                 'fields' => [
                     ['name' => 'group', 'label' => 'Where it appears', 'type' => 'select', 'options' => 'link_groups', 'rules' => 'required'],
                     ['name' => 'title', 'label' => 'Title', 'type' => 'text', 'rules' => 'required|max:255'],
-                    ['name' => 'subtitle', 'label' => 'Sub-title', 'type' => 'text', 'rules' => 'nullable|max:255', 'help' => 'Used by the "Important links" tiles.'],
+                    ['name' => 'subtitle', 'label' => 'Sub-title', 'type' => 'text', 'rules' => 'nullable|max:255', 'help' => 'Important links tiles: the small text. Emergency numbers: the phone number shown (e.g. ৯৯৯).'],
                     ['name' => 'url', 'label' => 'URL', 'type' => 'text', 'rules' => 'nullable|max:500', 'help' => 'Full address (https://…) or a site path such as /content/14.html'],
                     ['name' => 'image', 'label' => 'Icon / image', 'type' => 'image', 'dir' => 'links', 'store' => 'path', 'rules' => 'nullable|image|max:4096'],
-                    ['name' => 'is_extra', 'label' => 'Hidden until "Show more" (Important links only)', 'type' => 'bool', 'rules' => 'nullable|boolean'],
+                    ['name' => 'is_extra', 'label' => 'Hidden until "Show more" (Important links and Emergency numbers)', 'type' => 'bool', 'rules' => 'nullable|boolean'],
                     ['name' => 'ordering', 'label' => 'Ordering', 'type' => 'number', 'rules' => 'nullable|integer'],
                     $status,
                 ],
@@ -233,9 +233,12 @@ class ResourceRegistry
             ],
             // ---------------------------------------------------------------- logs (read-only)
             'audit-trail' => [
-                'model' => AuditTrail::class, 'title' => 'Audit trail', 'plural' => 'Audit trail', 'icon' => 'bi-clock-history',
-                'order' => ['id', 'desc'], 'search' => [], 'actions' => ['index', 'destroy'], 'filters' => ['user_id' => ['User', 'users']],
-                'columns' => [['id', 'ID'], ['user_id', 'User', 'option', 'users'], ['login_time', 'Login', 'datetime'], ['logout_time', 'Logout', 'datetime']],
+                'model' => AuditTrail::class, 'title' => 'Login history', 'plural' => 'Login history', 'icon' => 'bi-clock-history',
+                'order' => ['id', 'desc'], 'search' => ['ip_address'], 'actions' => ['index', 'destroy'], 'filters' => ['user_id' => ['User', 'users']],
+                'columns' => [
+                    ['id', 'ID'], ['user_id', 'User', 'option', 'users'], ['login_time', 'Signed in', 'datetime'], ['logout_time', 'Signed out', 'datetime'],
+                    ['ip_address', 'IP address'], ['browser', 'Browser / device'],
+                ],
                 'fields' => [],
             ],
         ];

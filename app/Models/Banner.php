@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\Status;
 use App\Enums\YesNo;
+use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -27,6 +28,7 @@ use Illuminate\Support\Carbon;
  */
 class Banner extends BaseModel
 {
+    use Auditable;
     use SoftDeletes;
 
     protected function casts(): array

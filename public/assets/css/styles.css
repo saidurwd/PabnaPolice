@@ -1,4 +1,4 @@
-html, body { margin: 0; padding: 0;}
+html, body { margin: 0; padding: 0;overflow-x: hidden !important;width: 100% !important;}
 section.wrap{width:85%;margin:0 auto;border:0px solid #909090;}
 article{border:0px solid #909090;padding:0 !important;margin:0 !important;}
 h1,h2,h3,h4,h5,h6{margin:0;padding:0;}
@@ -772,7 +772,7 @@ ul.navbar-nav li p:hover{display:block;color:#d0d0d0;padding:0 15px 0 0 !importa
 ul.navbar-nav li.active a{background:#c0c0c0 !important;padding:0 15px !important;}
 div#nav2 div ul.navbar-nav li{transition:ease-in-out 0.3s;}
 div#nav2 div ul.navbar-nav li:hover{display:block;background:#131b43 !important;}
-div#nav2 div ul.navbar-nav li a{display:block;background:none !important;color:#ffffff !important;padding:0px 10px 0px 10px !important;height:40px;font-family:'Pragati Narrow', sans-serif;font-size:16px;transition:ease-in-out 0.3s;}
+div#nav2 div ul.navbar-nav li a{display:block;background:none !important;color:#ffffff !important;padding:0px 10px 0px 10px !important;height:40px;font-family:'Pragati Narrow', sans-serif;font-size:18px;transition:ease-in-out 0.3s;}
 div#nav2 div ul.navbar-nav li a:hover{display:block;color:#ffffff !important;background:#131b43 !important;padding:0px 10px 0px 10px !important;height:40px;font-family:'Pragati Narrow', sans-serif;}
 div#nav2 div ul.navbar-nav li ul{margin:0;padding:0;}
 div#nav2 div ul.navbar-nav li ul li a{display:block;background:none !important;color:#d0d0d0 !important;padding:0px 15px 0px 15px !important;height:35px;line-height:35px;font-family:'Pragati Narrow', sans-serif;}
@@ -812,7 +812,7 @@ ul.navbar-nav li a:hover{display:block;color:#d0d0d0;padding:0 !important;height
 div#nav2{background:#fff !important;padding:0;}
 nav.navbar{border:0px solid #ff0000;padding-bottom:0 !important;border-radius:0;background:none;min-height:30px;}
 nav.navbar div{margin:0 !important;border:0px solid #ff0000;}
-ul.navbar-nav{border:0px solid #ff0000;padding:10px !important;background:none;box-shadow:none;}
+ul.navbar-nav{border:0px solid #ff0000;padding:10px !important;background:none;box-shadow:none;background-color: #ddd;}
 ul.navbar-nav li a{display:block;background:none !important;color:#fff;padding:0px 10px 0px 0px !important;height:30px;line-height:30px;font-family:"Arial";}
 ul.navbar-nav > li > a:before{content:"⊚ ";color:yellow;}
 ul.navbar-nav > li > ul{padding:0;}

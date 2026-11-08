@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Support\AdminLogin;
+use App\Support\Logs\Security;
 use App\Support\TwoFactor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -44,6 +45,7 @@ class TwoFactorChallengeController extends Controller
                 $user->two_factor_recovery_codes = array_values($codes);
                 $user->save();
                 $ok = true;
+                Security::record('recovery_code_used', Security::WARNING, 'A two-factor recovery code was used to sign in ('.count($codes).' left)', $user->id, $user->username);
             }
         } elseif ($request->filled('code')) {
             $ok = $twoFactor->verify((string) $user->two_factor_secret, (string) $request->input('code'));
@@ -51,6 +53,8 @@ class TwoFactorChallengeController extends Controller
 
         if (! $ok) {
             RateLimiter::hit($key);
+            Security::record('two_factor_failed', Security::WARNING, 'Wrong two-factor code', $user->id, $user->username);
+
             throw ValidationException::withMessages(['code' => 'That code is not valid.']);
         }
 

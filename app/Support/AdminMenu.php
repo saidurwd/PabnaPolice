@@ -80,6 +80,8 @@ class AdminMenu
             $url = $user->can('settings.view') ? route('admin.settings') : null;
         } elseif ($path === 'role') {
             $url = $user->can('role.view') ? route('admin.roles.index') : null;
+        } elseif (isset(PermissionCatalog::PAGES[$path])) {
+            $url = $user->can($path.'.view') ? route(PermissionCatalog::PAGES[$path]['route']) : null;
         } elseif ($def = ResourceRegistry::find($path)) {
             $url = $user->can($def['slug'].'.view') ? route('admin.resource.index', $def['slug']) : null;
             $badge = $url && $def['slug'] === 'feedback' ? (Feedback::where('is_read', false)->count() ?: null) : null;

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Support\Logs\Activity;
+use App\Support\Logs\Security;
 use App\Support\PermissionCatalog;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -36,6 +38,8 @@ class RoleController extends Controller
 
         $role = Role::create(['name' => $data['name'], 'guard_name' => 'web']);
         $role->syncPermissions($data['permissions'] ?? []);
+        Activity::record('role_created', "Created role \"{$role->name}\"", ['permissions' => $data['permissions'] ?? []]);
+        Security::record('role_changed', Security::WARNING, "Role \"{$role->name}\" created with ".count($data['permissions'] ?? []).' permission(s)');
 
         return redirect()->route('admin.roles.index')->with('success', "Role \"{$role->name}\" created.");
     }
@@ -60,8 +64,15 @@ class RoleController extends Controller
             'permissions.*' => Rule::in(PermissionCatalog::names()),
         ]);
 
+        $before = $role->permissions->pluck('name')->all();
         $role->update(['name' => $data['name']]);
         $role->syncPermissions($data['permissions'] ?? []);
+        $added = array_values(array_diff($data['permissions'] ?? [], $before));
+        $removed = array_values(array_diff($before, $data['permissions'] ?? []));
+        Activity::record('role_updated', "Updated role \"{$role->name}\"", ['added' => $added, 'removed' => $removed]);
+        if ($added || $removed) {
+            Security::record('role_changed', Security::WARNING, "Permissions of role \"{$role->name}\" changed (+".count($added).' / -'.count($removed).')', null, null, ['added' => $added, 'removed' => $removed]);
+        }
 
         return redirect()->route('admin.roles.index')->with('success', "Role \"{$role->name}\" saved.");
     }
@@ -76,6 +87,8 @@ class RoleController extends Controller
         }
 
         $role->delete();
+        Activity::record('role_deleted', "Deleted role \"{$role->name}\"");
+        Security::record('role_changed', Security::WARNING, "Role \"{$role->name}\" deleted");
 
         return redirect()->route('admin.roles.index')->with('success', 'Role deleted.');
     }

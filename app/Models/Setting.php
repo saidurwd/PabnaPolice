@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use App\Support\SiteCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
@@ -15,6 +16,8 @@ use Illuminate\Support\Facades\Cache;
  */
 class Setting extends Model
 {
+    use Auditable;
+
     protected $guarded = ['id'];
 
     private static ?array $loaded = null;

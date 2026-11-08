@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -17,6 +18,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Menu extends BaseModel
 {
+    use Auditable;
+
     public $timestamps = false;
 
     /** @return HasMany<Menu, $this> */

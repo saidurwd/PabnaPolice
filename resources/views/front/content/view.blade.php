@@ -6,8 +6,8 @@
 @section('og_type', 'article')
 @section('og_image', $content->imageUrl() ?? asset('assets/images/police-logo-circular.png'))
 @section('inner')
-    <div class="pull-left" style="padding: 0px 10px 10px 0px;">
-        @if ($url = $content->imageUrl())<img src="{{ $url }}" alt="{{ $content->title }}" class="img-responsive" title="{{ $content->title }}">@endif
+    <div class="float-start" style="padding: 0px 10px 10px 0px;">
+        @if ($url = $content->imageUrl())<img src="{{ $url }}" alt="{{ $content->title }}" class="img-fluid" title="{{ $content->title }}">@endif
     </div>
-    <div class="pull-left">{!! $content->details !!}</div>
+    <div class="float-start">{!! $content->details !!}</div>
 @endsection

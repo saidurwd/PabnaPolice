@@ -10,10 +10,11 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// Nightly backup of the database and uploads (storage/app/private/<app name>), then prune old ones.
-Schedule::command('backup:clean')->dailyAt('01:00');
-Schedule::command('backup:run')->dailyAt('01:30');
-Schedule::command('backup:monitor')->dailyAt('03:00');   // warns (by e-mail) when the newest backup is too old
+// DISABLED: production PHP has no ext-zip. Re-enable all three once zip is available.
+// // Nightly backup of the database and uploads (storage/app/private/<app name>), then prune old ones.
+// Schedule::command('backup:clean')->dailyAt('01:00');
+// Schedule::command('backup:run')->dailyAt('01:30');
+// Schedule::command('backup:monitor')->dailyAt('03:00');   // warns (by e-mail) when the newest backup is too old
 
 // Lets System health tell whether cron is really running the scheduler.
 Schedule::call(fn () => Cache::put(HealthCheck::HEARTBEAT_KEY, time(), 3600))->name('scheduler-heartbeat')->everyMinute();
